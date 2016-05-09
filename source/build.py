@@ -95,14 +95,24 @@ def make_engine(base_dir):
     return engine
 
 
-def add_p_tags(raw_str):
-    """Replace blank lines with HTML <p> tags"""
+def add_p_tags(raw_str, page_title):
+    """Replace blank lines with HTML <p> tags
     
-    mtch = re.search(r".\n$", raw_str)
+    The page_title argument is needed for the error messages.
+    
+    """
+    
+    mtch = re.search(r"(?<!\n)$", raw_str)
     if not mtch:
         raise BuildError(
-            "This string SHOULD end with a single newline character, but it "
-            "ends with something else, something incorrect:\n%s" % raw_str)
+            "The page '%s' ends with two or more newline characters. There "
+            "should be exactly one newline at the end." % page_title)
+    
+    mtch2 = re.search(r"\n$", raw_str)
+    if not mtch2:
+        raise BuildError(
+            "The page '%s' does not have a newline character at the end. "
+            "please add exactly one newline at the end." % page_title)
     
     o = ['<p>\n']
     o.append(re.sub(r"\n\n", "\n</p>\n\n<p>\n", raw_str))
@@ -136,6 +146,16 @@ def compile_one_page(base_dir, engine, page_filename):
     page_raw = page_file.read()
     page_file.close()
     
+    if '\r' in page_raw:
+        raise BuildError(
+            "The file %s contains CR character(s), which is bad. Fix it." % 
+            page_filename)
+    
+    if '\t' in page_raw:
+        raise BuildError(
+            "The file %s contains hard tab character(s), which is bad. "
+            "Please fix it." % page_filename)
+    
     mtch = page_pat.search(page_raw)
     if not mtch:
         raise BuildError(
@@ -144,14 +164,20 @@ def compile_one_page(base_dir, engine, page_filename):
     
     page_title = mtch.group('page_title')
     page_content = mtch.group('page_content')
-    page_content = add_p_tags(page_content)
+    page_content = add_p_tags(page_content, page_title)
     
     base_template = engine.get_template('base.html')
     context_object = Context({
         'page_title': page_title,
         'page_content': page_content})
     rendered = base_template.render(context_object)
-    print rendered
+    
+    out_filepathname = os.path.join(base_dir, 'build', page_filename)
+    out_file = open(out_filepathname, 'wb')
+    out_file.write(rendered)
+    out_file.close()
+    
+    print "Compiled %s." % page_filename
 
 
 #=============================== Test Functions ===============================#
