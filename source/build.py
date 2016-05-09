@@ -8,6 +8,9 @@ import textwrap
 import os
 import sys
 import django
+import django.template
+
+Context = django.template.Context
 
 from dehr_helpers import *
 
@@ -48,7 +51,7 @@ def check_versions():
     if (django_version[0] != 1) or (django_version[1] != 9):
         raise BuildError(
             "You must use Django 1.9.x. You are using Django %s." % 
-            django_version)
+            (django_version,))
     
     python_version = sys.version_info
     
@@ -67,8 +70,54 @@ def check_versions():
             "Your version of Python is probably too old. Try 2.7.10 or newer.")
 
 
-def make_engine():
-    pass
+def make_engine(base_dir):
+    """Make a Django template Engine instance
+    
+    See here:
+    
+    https://docs.djangoproject.com/en/1.9/ref/templates/api/
+    
+    """
+    
+    templates_dir = os.path.join(base_dir, 'source', 'templates')
+    
+    engine = django.template.Engine(
+        dirs = [templates_dir],
+        debug = True,
+        libraries = None,       # I will use this for custom tags
+    )
+    
+    return engine
+
+
+def simple_test(engine):
+    """A very simple test"""
+    
+    template_object = engine.get_template('simple_template_test.html')
+    context_object = Context({'whose_children': 'Florey'})
+    rendered = template_object.render(context_object)
+    print rendered
+
+
+def template_test02(engine):
+    """This requires the extends tag"""
+    
+    template_object = engine.get_template('template_test02.html')
+    context_object = Context({})
+    rendered = template_object.render(context_object)
+    print rendered
+
+
+def template_test03(engine):
+    """This uses base.html"""
+    
+    template_object = engine.get_template('base.html')
+    context_object = Context({
+        'page_title': "Template Test 03",
+        'page_content': "<p>Paragraph one.</p><p>Paragraph two, dude.</p>",
+    })
+    rendered = template_object.render(context_object)
+    print rendered
 
 
 if __name__ == '__main__':
@@ -85,7 +134,11 @@ if __name__ == '__main__':
         print "Type 'python build.py -h' for more help."
         sys.exit()
     
+    engine = make_engine(BASE_DIR)
+    
     if args.build_all:
         # The option '-b' was set.
         
-        print BASE_DIR
+        # simple_test(engine)
+        # template_test02(engine)
+        template_test03(engine)

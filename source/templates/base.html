@@ -1,1 +1,17 @@
-This template is totally static.
+{% extends "base_base.html" %}
+
+
+{% if page_title %}
+    {% block title %}DEHR: {{ page_title }}{% endblock title %}
+{% else %}
+    {# pass, see base_base.html for the default title #}
+{% endif %}
+
+
+{% block base_content %}
+
+<h1>{{ page_title }}</h1>
+
+{{ page_content }}
+
+{% endblock base_content %}
