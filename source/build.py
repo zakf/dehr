@@ -7,9 +7,10 @@ import argparse
 import textwrap
 import os
 import sys
+import re
+
 import django
 import django.template
-
 Context = django.template.Context
 
 from dehr_helpers import *
@@ -26,6 +27,8 @@ BASE_DIR = os.path.dirname(source_dir_path)         # Chops off '/source'
 # BASE_DIR == '/Users/zakf/progs/dehr'
 
 
+#======================== Command Line Argument Parser ========================#
+
 parser = argparse.ArgumentParser(
     formatter_class=argparse.RawDescriptionHelpFormatter,
     description=textwrap.dedent("""\
@@ -38,6 +41,8 @@ parser = argparse.ArgumentParser(
 parser.add_argument('-b', '--build-all', action='store_true', 
                     help="Build the website")
 
+
+#============================= Core Functionality =============================#
 
 def check_versions():
     """Confirm that Python and Django are the correct versions
@@ -90,6 +95,67 @@ def make_engine(base_dir):
     return engine
 
 
+def add_p_tags(raw_str):
+    """Replace blank lines with HTML <p> tags"""
+    
+    mtch = re.search(r".\n$", raw_str)
+    if not mtch:
+        raise BuildError(
+            "This string SHOULD end with a single newline character, but it "
+            "ends with something else, something incorrect:\n%s" % raw_str)
+    
+    o = ['<p>\n']
+    o.append(re.sub(r"\n\n", "\n</p>\n\n<p>\n", raw_str))
+    o.append('</p>\n')
+    
+    return ''.join(o)
+
+
+"""
+For examples of hardcore regexes, see here:
+    ~/Dropbox/iPhone/Current/Programming/
+    Where_to_Find_Hardcore_Regexes_Regular_Expressions.txt
+
+The DOTALL flag (?s) is very important. With DOTALL set, the . will match everything, including newline characters. Without this flag, . will NOT match newlines, and thus pattern matches will never be more than one line (unless you explicitly include \n in the pattern).
+"""
+
+page_pat = re.compile(r"""(?xs)     # x means VERBOSE, s means DOTALL.
+^                       # Matches the beginning of the string.
+(?P<page_title>.*?)\n   # The entire first line is the page title.
+[ \n\r\t]               # Throw away any whitespace characters.
+(?P<page_content>.*)    # The remainder of the file is matched here.
+$                       # Matches the end of the string.
+""")
+
+
+def compile_one_page(base_dir, engine, page_filename):
+    """Compile and save one HTML file"""
+    
+    page_filepathname = os.path.join(base_dir, 'source', 'pages', page_filename)
+    page_file = open(page_filepathname, 'rb')
+    page_raw = page_file.read()
+    page_file.close()
+    
+    mtch = page_pat.search(page_raw)
+    if not mtch:
+        raise BuildError(
+            "The page_pat regex did not match for the file %s." % 
+            page_filename)
+    
+    page_title = mtch.group('page_title')
+    page_content = mtch.group('page_content')
+    page_content = add_p_tags(page_content)
+    
+    base_template = engine.get_template('base.html')
+    context_object = Context({
+        'page_title': page_title,
+        'page_content': page_content})
+    rendered = base_template.render(context_object)
+    print rendered
+
+
+#=============================== Test Functions ===============================#
+
 def simple_test(engine):
     """A very simple test"""
     
@@ -120,6 +186,8 @@ def template_test03(engine):
     print rendered
 
 
+#============================== If Name Is Main ===============================#
+
 if __name__ == '__main__':
     args = parser.parse_args()
     
@@ -139,6 +207,10 @@ if __name__ == '__main__':
     if args.build_all:
         # The option '-b' was set.
         
+        ## Tests:
+        ## 
         # simple_test(engine)
         # template_test02(engine)
-        template_test03(engine)
+        # template_test03(engine)
+        
+        compile_one_page(BASE_DIR, engine, 'page_test_01.html')
