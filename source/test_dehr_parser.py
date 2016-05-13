@@ -40,6 +40,25 @@ class RegexTest(unittest.TestCase):
         self.assertEqual(mtch3.group("next_special"), "\n\n")
 
 
+class LexerTest(unittest.TestCase):
+    def test_lexer(self):
+        input = "<h1>Heading</h1>\n\nFirst.\n\nSecond.<b>Bold.</b>."
+        tokens = lexer(input)
+        self.assertEqual(tokens, [
+            '<', 
+            'h1>Heading', 
+            '<', 
+            '/h1>', 
+            '\n\n', 
+            'First.', 
+            '\n\n', 
+            'Second.', 
+            '<', 
+            'b>Bold.', 
+            '<', 
+            '/b>.'])
+
+
 #============================== If Name Is Main ===============================#
 
 if __name__ == '__main__':

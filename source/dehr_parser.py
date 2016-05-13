@@ -48,3 +48,39 @@ token_pat = re.compile(r"""(?xs)                # x: Verbose, s: DOTALL
         |$  # Maybe the input ends, store that in 'next_special' too.
       )
     )""")
+
+
+#=================================== Lexer ====================================#
+
+def lexer(input_str):
+    """The lexer takes in a raw pseudo-HTML string and outputs a list of tokens
+    
+    Arguments:
+        input_str:  String, raw pseudo-HTML.
+    
+    Returns:
+        token_list: A list of strings, each string is a token.
+    
+    """
+    
+    tokens = []
+    remainder = input_str
+    
+    while remainder:
+        mtch = token_pat.match(remainder)
+        if mtch == None:
+            raise ParserError(
+                "VERY weird, token_pat did not find a match.\n"
+                "tokens = %r\n"
+                "remainder = %r\n"
+                "input_str = %r" % (tokens, remainder, input_str))
+        if mtch.group("special"):
+            # The remainder starts with a special token:
+            tokens.append(mtch.group("special"))
+            remainder = remainder[mtch.end("special"):]
+        else:
+            # The remainder does NOT start with a special token:
+            tokens.append(mtch.group("other"))
+            remainder = remainder[mtch.end("other"):]
+    
+    return tokens
