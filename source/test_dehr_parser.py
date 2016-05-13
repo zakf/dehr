@@ -1,13 +1,43 @@
 # File test_dehr_parser.py
 
+from exceptions import IndexError
 import unittest
 
 from dehr_parser import *
 
 
-class InitialTest(unittest.TestCase):
-    def test_platform_versions(self):
-        check_versions()
+class RegexTest(unittest.TestCase):
+    def test_lexer_regexes(self):
+        """Demonstrate the behavior of re.MatchObject (mtch)"""
+        
+        input = "<"
+        mtch = token_pat.search(input)
+        
+        # Access a group that DID match:
+        self.assertEqual(mtch.group("special"), "<")
+        
+        # Access groups that did NOT match:
+        self.assertEqual(mtch.group("other"), None)
+        self.assertEqual(mtch.group("next_special"), None)
+        
+        # Accessing a non-existent group raises an error:
+        with self.assertRaises(IndexError):
+            print mtch.group("fake_group_name")
+    
+    def test_lexer_regexes2(self):
+        input = "\n\nFoo bar."
+        mtch = token_pat.search(input)
+        self.assertEqual(mtch.group("special"), "\n\n")
+        
+        input2 = "\\\n\nFoo bar."
+        mtch2 = token_pat.search(input2)
+        self.assertEqual(mtch2.group("special"), "\\\n\n")
+        
+        input3 = "Foo bar.\n\n"
+        mtch3 = token_pat.search(input3)
+        self.assertEqual(mtch3.group("special"), None)
+        self.assertEqual(mtch3.group("other"), "Foo bar.")
+        self.assertEqual(mtch3.group("next_special"), "\n\n")
 
 
 #============================== If Name Is Main ===============================#
