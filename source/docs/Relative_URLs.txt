@@ -1,0 +1,7 @@
+Relative URLs:
+
+See here:
+https://www.w3.org/TR/WD-html40-970917/htmlweb.html
+
+See here:
+RFC 1808
