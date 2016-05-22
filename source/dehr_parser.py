@@ -341,3 +341,85 @@ class MultiParagraphNode(Node):
             child.render()
             output.extend(child.output)
         self.output = output
+
+
+class TitleNode(Node):
+    """A special terminal node
+    
+    Matches the first line in the file, usually or perhaps always.
+    
+    Attributes:
+        title:      String, NOT a list of string, NO <h1> tags. This will be 
+                    accessible to the Django template engine.
+    
+    """
+    
+    def parse(self):
+        self.children = None
+        self.title = ''.join(self.input)
+    
+    def render(self):
+        self.output = ['<h1>', self.title, '</h1>']
+
+
+class WholePageNode(Node):
+    """A special nonterminal node
+    
+    Matches a whole page, which is usually one HTML file.
+    
+    Attributes:
+        title:      String, NOT a list of strings, NO <h1> tags, copied from 
+                    the TitleNode child.
+        
+        content:    String, NOT a list of strings, ready to be passed to 
+                    the Django template engine. Does NOT include the title.
+    
+    """
+    
+    def parse(self):
+        self.children = []
+        if '\n\n' in self.input:
+            break_index = self.input.index('\n\n')
+            title_node = TitleNode(self.input[:break_index])
+            second_child = TerminalNode([self.input[break_index]])
+            self.children.append(title_node)
+            self.children.append(second_child)
+            next_index = break_index + 1
+            third_child = MultiParagraphNode(self.input[next_index:])
+            self.children.append(third_child)
+        else:
+            input_str = ''.join(self.input)
+            raise ParserError(
+                "WholePageNode.parse() failed because there is no token "
+                "with two newlines in a row. The offending file starts "
+                "with this:\n\n%s" % input_str[0:60])
+        for child in self.children:
+            child.parse()
+        self.title = self.children[0].title
+    
+    def render(self):
+        """This is an UNUSUAL render() method
+        
+        The result of this method call should not be output directly, it should be passed to the Django template engine for special handling.
+        
+        """
+        
+        if len(self.children) != 3:
+            input_str = ''.join(self.input)
+            raise ParserError(
+                "WholePageNode.render() failed because there are not "
+                "exactly three nodes. The three nodes should be the "
+                "TitleNode, then [LF][LF], then exactly one "
+                "MultiParagraphNode. The offending file starts "
+                "with this:\n\n%s" % input_str[0:60])
+        
+        # self.title has already been set.
+        content_node = self.children[2]     # Ignore the first two nodes.
+        content_node.render()
+        self.content = ''.join(content_node.output)
+    
+    @property
+    def output(self):
+        raise ParserError(
+            "Unlike most Node objects, WholePageNode instances do NOT "
+            "have a node.output attribute. Do not attempt to use it.")

@@ -144,6 +144,39 @@ Third.
         self.assertEqual(
             output,
             """<h1>Heading</h1>\n\n<p>\nFirst.\n\nStill first, I escaped the prior two LF characters.\n</p>\n\n<p>\nSecond paragraph here.\n</p>\n\n<b>Non-paragraph</b> because of the bold tags.\n\n<p>\nThird.\n</p>""")
+    
+    def test_parser4(self):
+        input = """This Is the Title
+
+First paragraph here.
+
+Second paragraph.
+
+<h2>Heading, not a paragraph</h2>
+
+Third paragraph, end of file.
+
+"""
+        tokens = lexer(input)
+        node = WholePageNode(tokens)
+        node.parse()
+        node.render()
+        with self.assertRaisesRegexp(ParserError, 'have a node\.output'):
+            node.output
+        self.assertEqual(node.title, 'This Is the Title')
+        self.assertEqual(node.content, """<p>
+First paragraph here.
+</p>
+
+<p>
+Second paragraph.
+</p>
+
+<h2>Heading, not a paragraph</h2>
+
+<p>
+Third paragraph, end of file.
+</p>""")
 
 
 #============================== If Name Is Main ===============================#
