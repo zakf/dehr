@@ -92,8 +92,10 @@ def lexer(input_str):
     
     """
     
+    input_str2 = deal_with_final_newlines(input_str)
+    
     tokens = []
-    remainder = input_str
+    remainder = input_str2
     
     while remainder:
         mtch = token_pat.match(remainder)
@@ -113,6 +115,26 @@ def lexer(input_str):
             remainder = remainder[mtch.end("other"):]
     
     return tokens
+
+
+def deal_with_final_newlines(input_str):
+    """Remove all LF characters from the end of input_str
+    
+    The function lexer() chokes if input_str ends in a newline character. Writing regexes that handle terminal newline(s) correctly is VERY HARD, so I won't even attempt it.
+    
+    We will remove any number of final newline characters and output a string that ends in a DIFFERENT character.
+    
+    """
+    
+    done = False
+    
+    while (not done):
+        if input_str[-1] == '\n':
+            input_str = input_str[:-1]
+        else:
+            done = True
+    
+    return input_str
 
 
 #=================================== Parser ===================================#

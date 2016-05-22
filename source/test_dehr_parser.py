@@ -59,6 +59,18 @@ class LexerTest(unittest.TestCase):
             '/b>.'])
 
 
+class ParserTest(unittest.TestCase):
+    def test_parser(self):
+        input = "<h1>Heading</h1>\n\nFirst.\n\nSecond.\n"
+        tokens = lexer(input)
+        node = MultiParagraphNode(tokens)
+        node.parse()
+        node.render()
+        self.assertEqual(
+            ''.join(node.output),
+            "<h1>Heading</h1>\n\n<p>\nFirst.\n</p>\n\n<p>\nSecond.\n</p>")
+
+
 #============================== If Name Is Main ===============================#
 
 if __name__ == '__main__':
