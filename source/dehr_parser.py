@@ -13,6 +13,9 @@ from dehr_helpers import *
 class ParserError(DehrError):
     pass
 
+class CrCharacterError(DehrError):
+    pass
+
 
 #=========================== Regexes for the Lexer ============================#
 
@@ -91,6 +94,12 @@ def lexer(input_str):
         token_list: A list of strings, each string is a token.
     
     """
+    
+    if '\r' in input_str:
+        raise CrCharacterError(
+            "There was at least one CR character in the input, but this is "
+            "forbidden. You may NOT use CR characters. Here is the beginning "
+            "of the offending string:\n\n%r" % input_str[0:60])
     
     input_str2 = deal_with_final_newlines(input_str)
     input_str3 = deal_with_excess_newlines(input_str2)
@@ -236,10 +245,32 @@ class NonParagraphLineNode(Node):
         self.output = self.input[:]
 
 
+def unescape_double_newline(input_token_list):
+    """Finds all '\[LF][LF]' tokens and removes the \ escape character
+    
+    Input:
+        input_token_list:   List of tokens (strings).
+    
+    Output:
+        clean_token_list:   List of tokens (strings).
+    
+    """
+    
+    clean_token_list = []
+    for token in input_token_list:
+        if token == '\\\n\n':
+            clean_token_list.append('\n\n')
+        else:
+            clean_token_list.append(token)
+    return clean_token_list
+
+
 class OneLineNode(Node):
     """A nonterminal node
     
-    Matches one line of raw input text.
+    Matches one line of raw input text, usually.
+    
+    Matches multiple lines if there is a single [LF] character in the middle. Also matches multipel lines if there is an ESCAPED sequence of two [LF] characters, i.e. '\[LF][LF]' with a backslash.
     
     """
     
@@ -247,17 +278,20 @@ class OneLineNode(Node):
         if self.input[0] == '<':
             # This is a NonParagraphLineNode.
             self.children = [TerminalNode(['<'])]
-            self.children.append(NonParagraphLineNode(self.input[1:]))
+            child_input = unescape_double_newline(self.input[1:])
+            self.children.append(NonParagraphLineNode(child_input))
         
         elif self.input[0] == '\\<':
             # This is a OneParagraphNode.
             child_input = ['<']         # We remove the \ escape character
-            child_input.extend(self.input[1:])
+            more_input = unescape_double_newline(self.input[1:])
+            child_input.extend(more_input)
             self.children = [OneParagraphNode(child_input)]
         
         else:
             # This is a OneParagraphNode.
-            self.children = [OneParagraphNode(self.input)]
+            child_input = unescape_double_newline(self.input)
+            self.children = [OneParagraphNode(child_input)]
         
         for child in self.children:
             child.parse()

@@ -76,6 +76,11 @@ class LexerTest(unittest.TestCase):
         output4 = deal_with_excess_newlines(input4)
         self.assertEqual(input2, output4)
         self.assertNotEqual(input4, output4)
+    
+    def test_error_on_cr_chars(self):
+        input = "This Is the Title\n\nFirst.\r\n\r\nSecond."
+        with self.assertRaises(CrCharacterError):
+            tokens = lexer(input)
 
 
 class ParserTest(unittest.TestCase):
@@ -116,6 +121,29 @@ Still fourth.
         self.assertEqual(
             output,
             """<h1>Heading Line</h1>\n\n<p>\nFirst.\n</p>\n\n<p>\nSecond paragraph.\n</p>\n\n<h2>Heading</h2>\n\n<p>\nThird.\n</p>\n\n<p>\nFourth.\nStill fourth.\n</p>\n\n<p>\n<h2>Fifth,</h2> this was escaped.\n</p>""")
+    
+    def test_parser3(self):
+        input = """<h1>Heading</h1>
+
+First.\\
+
+Still first, I escaped the prior two LF characters.
+
+Second paragraph here.
+
+<b>Non-paragraph</b> because of the bold tags.
+
+Third.
+
+"""
+        tokens = lexer(input)
+        node = MultiParagraphNode(tokens)
+        node.parse()
+        node.render()
+        output = ''.join(node.output)
+        self.assertEqual(
+            output,
+            """<h1>Heading</h1>\n\n<p>\nFirst.\n\nStill first, I escaped the prior two LF characters.\n</p>\n\n<p>\nSecond paragraph here.\n</p>\n\n<b>Non-paragraph</b> because of the bold tags.\n\n<p>\nThird.\n</p>""")
 
 
 #============================== If Name Is Main ===============================#
