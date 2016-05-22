@@ -14,6 +14,7 @@ import django.template
 Context = django.template.Context
 
 from dehr_helpers import *
+import dehr_parser
 
 
 class BuildError(DehrError):
@@ -95,6 +96,7 @@ def make_engine(base_dir):
     return engine
 
 
+# DEPRECATED, use dehr_parser.py instead:
 def add_p_tags(raw_str, page_title):
     """Replace blank lines with HTML <p> tags
     
@@ -129,6 +131,7 @@ For examples of hardcore regexes, see here:
 The DOTALL flag (?s) is very important. With DOTALL set, the . will match everything, including newline characters. Without this flag, . will NOT match newlines, and thus pattern matches will never be more than one line (unless you explicitly include \n in the pattern).
 """
 
+# DEPRECATED: page_pat is deprecated, use dehr_parser.py instead:
 page_pat = re.compile(r"""(?xs)     # x means VERBOSE, s means DOTALL.
 ^                       # Matches the beginning of the string.
 (?P<page_title>.*?)\n   # The entire first line is the page title.
@@ -156,20 +159,16 @@ def compile_one_page(base_dir, engine, page_filename):
             "The file %s contains hard tab character(s), which is bad. "
             "Please fix it." % page_filename)
     
-    mtch = page_pat.search(page_raw)
-    if not mtch:
-        raise BuildError(
-            "The page_pat regex did not match for the file %s." % 
-            page_filename)
-    
-    page_title = mtch.group('page_title')
-    page_content = mtch.group('page_content')
-    page_content = add_p_tags(page_content, page_title)
+    tokens = dehr_parser.lexer(page_raw)
+    whole_page_node = dehr_parser.WholePageNode(tokens)
+    whole_page_node.parse()
+    whole_page_node.render()
+    wpn = whole_page_node
     
     base_template = engine.get_template('base.html')
     context_object = Context({
-        'page_title': page_title,
-        'page_content': page_content})
+        'page_title': wpn.title,
+        'page_content': wpn.content})
     rendered = base_template.render(context_object)
     
     out_filepathname = os.path.join(base_dir, 'build', page_filename)
