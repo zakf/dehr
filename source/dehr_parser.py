@@ -93,9 +93,10 @@ def lexer(input_str):
     """
     
     input_str2 = deal_with_final_newlines(input_str)
+    input_str3 = deal_with_excess_newlines(input_str2)
     
     tokens = []
-    remainder = input_str2
+    remainder = input_str3
     
     while remainder:
         mtch = token_pat.match(remainder)
@@ -135,6 +136,18 @@ def deal_with_final_newlines(input_str):
             done = True
     
     return input_str
+
+
+excess_newlines_pat = re.compile(r"[\n]{3,}")
+
+def deal_with_excess_newlines(input_str):
+    """The parser chokes if there are 3+ LF characters in a row
+    
+    Whenever you see 3+ LF characters in a row, replace with exactly 2 LF characters to avoid problems.
+    
+    """
+    
+    return excess_newlines_pat.sub('\n\n', input_str)
 
 
 #=================================== Parser ===================================#
@@ -238,8 +251,9 @@ class OneLineNode(Node):
         
         elif self.input[0] == '\\<':
             # This is a OneParagraphNode.
-            self.children = [TerminalNode(['<'])]   # We remove the \ character
-            self.children.append(OneParagraphNode(self.input[1:]))
+            child_input = ['<']         # We remove the \ escape character
+            child_input.extend(self.input[1:])
+            self.children = [OneParagraphNode(child_input)]
         
         else:
             # This is a OneParagraphNode.

@@ -57,6 +57,25 @@ class LexerTest(unittest.TestCase):
             'b>Bold.', 
             '<', 
             '/b>.'])
+    
+    def test_deal_with_excess_newlines(self):
+        input1 = "First\nSecond"
+        output1 = deal_with_excess_newlines(input1)
+        self.assertEqual(input1, output1)
+        
+        input2 = "First\n\nSecond"
+        output2 = deal_with_excess_newlines(input2)
+        self.assertEqual(input2, output2)
+        
+        input3 = "First\n\n\nSecond"
+        output3 = deal_with_excess_newlines(input3)
+        self.assertEqual(input2, output3)
+        self.assertNotEqual(input3, output3)
+        
+        input4 = "First\n\n\n\nSecond"
+        output4 = deal_with_excess_newlines(input4)
+        self.assertEqual(input2, output4)
+        self.assertNotEqual(input4, output4)
 
 
 class ParserTest(unittest.TestCase):
@@ -69,6 +88,34 @@ class ParserTest(unittest.TestCase):
         self.assertEqual(
             ''.join(node.output),
             "<h1>Heading</h1>\n\n<p>\nFirst.\n</p>\n\n<p>\nSecond.\n</p>")
+    
+    def test_parser2(self):
+        input = """<h1>Heading Line</h1>
+
+First.
+
+Second paragraph.
+
+<h2>Heading</h2>
+
+Third.
+
+
+
+
+Fourth.
+Still fourth.
+
+\<h2>Fifth,</h2> this was escaped.
+"""
+        tokens = lexer(input)
+        node = MultiParagraphNode(tokens)
+        node.parse()
+        node.render()
+        output = ''.join(node.output)
+        self.assertEqual(
+            output,
+            """<h1>Heading Line</h1>\n\n<p>\nFirst.\n</p>\n\n<p>\nSecond paragraph.\n</p>\n\n<h2>Heading</h2>\n\n<p>\nThird.\n</p>\n\n<p>\nFourth.\nStill fourth.\n</p>\n\n<p>\n<h2>Fifth,</h2> this was escaped.\n</p>""")
 
 
 #============================== If Name Is Main ===============================#
