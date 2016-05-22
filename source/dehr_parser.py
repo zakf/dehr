@@ -179,3 +179,49 @@ class OneParagraphNode(Node):
         self.output = ['<p>\n']
         self.output.extend(self.input)
         self.output.append('\n</p>')
+
+
+class NonParagraphLineNode(Node):
+    """A type of terminal node
+    
+    For example, a line that starts with <h1> will become a NonParagraphLineNode.
+    
+    When rendered, it will NOT get wrapped in <p> tags.
+    
+    """
+    
+    def parse(self):
+        if len(self.input) < 1:
+            raise ParserError(
+                "NonParagraphLineNode.parse() was called, but the input was "
+                "not at least 1 token long.\ninput = %r." % self.input)
+        self.children = None
+    
+    def render(self):
+        self.output = self.input[:]
+
+
+class OneLineNode(Node):
+    """A nonterminal node
+    
+    Matches one line of raw input text.
+    
+    """
+    
+    def parse(self):
+        if self.input[0] == '<':
+            # This is a NonParagraphLineNode.
+            self.children = [TerminalNode(['<'])]
+            self.children.append(NonParagraphLineNode(self.input[1:]))
+        
+        elif self.input[0] == '\\<':
+            # This is a OneParagraphNode.
+            self.children = [TerminalNode(['<'])]   # We remove the \ character
+            self.children.append(OneParagraphNode(self.input[1:]))
+        
+        else:
+            # This is a OneParagraphNode.
+            self.children = [OneParagraphNode(self.input)]
+        
+        for child in self.children:
+            child.parse()
