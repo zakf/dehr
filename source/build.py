@@ -142,7 +142,12 @@ $                       # Matches the end of the string.
 
 
 def compile_one_page(base_dir, engine, page_filename):
-    """Compile and save one HTML file"""
+    """Compile and save one HTML file
+    
+    TODO:
+    Make this function more customizable. Currently, it only handles the template_file 'base.html' and it only handles the template context variables page_title and page_content. In the future, there might be a version where the template_file is 'one_drug.html' and the context variables include generic_names and brand_names and other stuff like that.
+    
+    """
     
     page_filepathname = os.path.join(base_dir, 'source', 'pages', page_filename)
     page_file = open(page_filepathname, 'rb')
@@ -252,5 +257,9 @@ if __name__ == '__main__':
         # simple_test(engine)
         # template_test02(engine)
         # template_test03(engine)
+        # compile_one_page(BASE_DIR, engine, 'page_test_01.html')
         
-        compile_one_page(BASE_DIR, engine, 'page_test_01.html')
+        pages_dir = os.path.join(BASE_DIR, 'source', 'pages')
+        for page_filename in os.listdir(pages_dir):
+            if page_filename[-5:] == '.html':
+                compile_one_page(BASE_DIR, engine, page_filename)

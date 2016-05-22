@@ -36,7 +36,7 @@ Compiled page_test_01.html.
 
 These are To-Do items:
 
-1. Currently, text in the source files is NOT parsed by the Django template engine. Change this. I need to create the Template objects dynamically by combining two files:
+[DONE] 1. Currently, text in the source files is NOT parsed by the Django template engine. Change this. I need to create the Template objects dynamically by combining two files:
     ~/progs/dehr/source/templates/base.html
     ~/progs/dehr/source/pages/{{ filename }}.html
 
