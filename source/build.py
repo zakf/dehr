@@ -165,11 +165,26 @@ def compile_one_page(base_dir, engine, page_filename):
     whole_page_node.render()
     wpn = whole_page_node
     
-    base_template = engine.get_template('base.html')
+    ## Old method, cannot deal with Django template syntax in the page_file:
+    # base_template = engine.get_template('base.html')
+    
+    templates_dir = os.path.join(base_dir, 'source', 'templates')
+    template_filepathname = os.path.join(templates_dir, 'base.html')
+    template_file = open(template_filepathname, 'rb')
+    template_raw = template_file.read()
+    template_file.close()
+    
+    # Insert the page_file code into the template_file code:
+    template_str = template_raw.replace(
+        '{{ page_content|safe }}',
+        wpn.content)
+    
+    template_object = engine.from_string(template_str)
     context_object = Context({
         'page_title': wpn.title,
-        'page_content': wpn.content})
-    rendered = base_template.render(context_object)
+        # 'page_content': wpn.content,  # Now I do this manually, see above.
+    })
+    rendered = template_object.render(context_object)
     
     out_filepathname = os.path.join(base_dir, 'build', page_filename)
     out_file = open(out_filepathname, 'wb')

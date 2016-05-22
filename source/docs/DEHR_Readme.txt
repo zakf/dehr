@@ -39,3 +39,10 @@ These are To-Do items:
 1. Currently, text in the source files is NOT parsed by the Django template engine. Change this. I need to create the Template objects dynamically by combining two files:
     ~/progs/dehr/source/templates/base.html
     ~/progs/dehr/source/pages/{{ filename }}.html
+
+
+#================================= Resources ==================================#
+
+How to manually compile Template objects and configure Engine objects:
+    https://docs.djangoproject.com/en/1.9/ref/templates/api/
+    Title: The Django template language: for Python programmers
