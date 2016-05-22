@@ -50,6 +50,35 @@ token_pat = re.compile(r"""(?xs)                # x: Verbose, s: DOTALL
     )""")
 
 
+#================================== Grammar ===================================#
+
+"""
+Let's define the grammar for our parser.
+
+See the Wikipedia article "formal grammar" for terminology and notation:
+https://en.wikipedia.org/wiki/Formal_grammar
+
+WholePageNode  -->  TitleNode  '\n\n'  MultiParagraphNode
+    
+    # The rule above may be made more complex to accommodate things like 
+    # alternate page titles, page title redirects, and tags, all of which would 
+    # go just under the title (TitleNode), which is the first line of the file.
+
+MultiParagraphNode  -->  OneLineNode  ('\n\n'  MultiParagraphNode)?
+    
+    # The rule above uses right recursion, also known as tail recursion. This 
+    # is the opposite of left recursion. I think tail recursion is easier to 
+    # implement, but I am not sure.
+
+OneLineNode  -->  '<'  NonParagraphLineNode         # Do NOT wrap in <p> tags
+
+OneLineNode  -->  '\<'  OneParagraphNode            # DO wrap in <p> tags
+
+OneLineNode  -->  OneParagraphNode                  # DO wrap in <p> tags
+
+"""
+
+
 #=================================== Lexer ====================================#
 
 def lexer(input_str):
@@ -84,3 +113,69 @@ def lexer(input_str):
             remainder = remainder[mtch.end("other"):]
     
     return tokens
+
+
+#=================================== Parser ===================================#
+
+class Node(object):
+    """A fully-parsed input is a branched tree of Nodes
+    
+    Attributes:
+        children:   List of Nodes or None. Iff this is a terminal Node, then 
+                    children == None. Iff this is a nonterminal Node, then children is a list of Nodes, or more precisely, it is a list of objects that inherit from Node.
+        input:      List of tokens (strings), all the raw input that 
+                    produced this Node.
+        output:     List of strings, all the raw HTML to be output in its 
+                    final form. Just concatenate the output and you are done.
+    
+    Methods:
+        parse:          First function to get called. It looks at self.input 
+                        and (generally) turns the input into one or more Nodes, and those Nodes are stored in self.children. Then, node.parse() is called on each of the child Nodes. The exception is iff this will become a TerminalNode, in which case the input is NOT turned into any Nodes and self.children == None.
+        render:         Last function to get called. It turns this Node into a 
+                        string of output HTML, and the output string is stored in self.output. To do this, it must recursively call node.render() on each of its children.
+    
+    """
+    
+    def __init__(self, input):
+        """The argument 'input' is a list of tokens (raw input strings)"""
+        self.input = input
+
+
+class TerminalNode(Node):
+    """A terminal node
+    
+    Attributes:
+        content:    String, NOT a list of strings (not a list of tokens).
+    
+    """
+    
+    def parse(self):
+        if len(self.input) != 1:
+            raise ParserError(
+                "TerminalNode.parse() was called, but the TerminalNode's "
+                "input was not exactly 1 token.\ninput = %r." % self.input)
+        self.children = None
+        self.content = self.input[0]
+    
+    def render(self):
+        self.output = [self.content]
+
+
+class OneParagraphNode(Node):
+    """A type of terminal node
+    
+    When rendered, it will get wrapped in <p> tags.
+    
+    """
+    
+    def parse(self):
+        if len(self.input) < 1:
+            raise ParserError(
+                "OneParagraphNode.parse() was called, but the input was not "
+                "at least 1 token long.\ninput = %r." % self.input)
+        self.children = None
+    
+    def render(self):
+        self.output = ['<p>\n']
+        self.output.extend(self.input)
+        self.output.append('\n</p>')
