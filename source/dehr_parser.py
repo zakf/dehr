@@ -225,3 +225,49 @@ class OneLineNode(Node):
         
         for child in self.children:
             child.parse()
+    
+    def render(self):
+        output = []
+        for child in self.children:
+            child.render()
+            output.extend(child.output)
+        self.output = output
+
+
+class MultiParagraphNode(Node):
+    """A nonterminal node
+    
+    Matches one or more paragraphs or non-paragraph lines.
+    
+    Modeled after zml.parser.RegularTextNode.
+    
+    """
+    
+    def parse(self):
+        self.children = []
+        while self.input:
+            self.parse_chunk()
+        for child in self.children:
+            child.parse()
+    
+    def parse_chunk(self):
+        if '\n\n' in self.input:
+            # This contains two or more OneLineNodes.
+            break_index = self.input.index('\n\n')
+            first_child = OneLineNode(self.input[:break_index])
+            second_child = TerminalNode([self.input[break_index]])
+            self.children.append(first_child)
+            self.children.append(second_child)
+            next_index = break_index + 1
+            self.input = self.input[next_index:]
+        else:
+            # This contains exactly one OneLineNode.
+            self.children.append(OneLineNode(self.input))
+            self.input = []
+    
+    def render(self):
+        output = []
+        for child in self.children:
+            child.render()
+            output.extend(child.output)
+        self.output = output
