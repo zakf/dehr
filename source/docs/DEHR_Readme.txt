@@ -44,6 +44,8 @@ These are To-Do items:
 
 3. Template tag {% self 'Lexapro' %} that will create a link to the page 'Lexapro' within the DEHR website. I am not sure about the name for the tag, I think 'self' might not be a good name.
 
+4. {% clearfix %} template tag, outputs <div class="clearfix">.</div>.
+
 
 #================================= Resources ==================================#
 
