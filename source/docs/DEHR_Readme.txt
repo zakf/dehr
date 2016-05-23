@@ -40,6 +40,10 @@ These are To-Do items:
     ~/progs/dehr/source/templates/base.html
     ~/progs/dehr/source/pages/{{ filename }}.html
 
+2. Template tag {% wiki 'Lexapro' %} that will create a link to Wikipedia.
+
+3. Template tag {% self 'Lexapro' %} that will create a link to the page 'Lexapro' within the DEHR website. I am not sure about the name for the tag, I think 'self' might not be a good name.
+
 
 #================================= Resources ==================================#
 
