@@ -90,7 +90,14 @@ def make_engine(base_dir):
     engine = django.template.Engine(
         dirs = [templates_dir],
         debug = True,
-        libraries = None,       # I will use this for custom tags
+        libraries = {
+            # Libraries mentioned here are accessible to the {% load %} tag, 
+            # but they are NOT loaded automatically. The key on the left is 
+            # a string that will be passed to {% load %} and the value on the 
+            # right is a dotted Python path to a Python module.
+            
+            'dehr_template_tags': 'dehr_template_tags',
+        },
     )
     
     return engine
