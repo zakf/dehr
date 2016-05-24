@@ -1,5 +1,6 @@
 # File test_dehr_parser.py
 
+from collections import OrderedDict
 from exceptions import IndexError
 import unittest
 
@@ -205,6 +206,13 @@ Second paragraph.
 <p>
 Third paragraph, end of file.
 </p>""")
+        
+        meta_dict = node.meta_dict
+        self.assertEqual(
+            meta_dict,
+            OrderedDict([
+                ('Key1', ['Value1A', 'Value1B']),
+                ('Key2', ['Value2A', 'Value2B'])]))
 
 
 #============================== If Name Is Main ===============================#

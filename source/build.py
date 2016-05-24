@@ -170,6 +170,8 @@ def compile_one_page(base_dir, engine, page_filename):
     whole_page_node.render()
     wpn = whole_page_node
     
+    # TODO: Access and use whole_page_node.meta_dict
+    
     ## Old method, cannot deal with Django template syntax in the page_file:
     # base_template = engine.get_template('base.html')
     
