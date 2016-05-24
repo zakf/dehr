@@ -34,7 +34,8 @@ special_tokens = r"""
     # Next, we search for unescaped special sequences:
     
     (?:<)|              # The opening of an HTML tag
-    (?:\n\n)            # Two newlines in a row
+    (?:\n\n)|           # Two newlines in a row
+    (?:[-]{5,})         # Five or more hyphens in a row
     
     # NOTE: It does NOT end in a | (OR).
 """
@@ -61,7 +62,13 @@ Let's define the grammar for our parser.
 See the Wikipedia article "formal grammar" for terminology and notation:
 https://en.wikipedia.org/wiki/Formal_grammar
 
-WholePageNode  -->  TitleNode  '\n\n'  MultiParagraphNode
+WholePageNode  -->  TitleNode
+                    '\n\n'
+                    MetaDictNode
+                    '\n\n'
+                    '-----'
+                    '\n\n'
+                    MultiParagraphNode
     
     # The rule above may be made more complex to accommodate things like 
     # alternate page titles, page title redirects, and tags, all of which would 
@@ -78,6 +85,12 @@ OneLineNode  -->  '<'  NonParagraphLineNode         # Do NOT wrap in <p> tags
 OneLineNode  -->  '\<'  OneParagraphNode            # DO wrap in <p> tags
 
 OneLineNode  -->  OneParagraphNode                  # DO wrap in <p> tags
+
+MetaDictNode  -->  DictPairNode  ('\n\n'  MetaDictNode)?
+
+DictPairNode  -->  KeyNode  ': '  ValueListNode
+
+ValueListNode  -->  ValueNode  (', '  ValueListNode)?
 
 """
 

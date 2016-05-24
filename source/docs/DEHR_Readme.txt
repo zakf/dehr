@@ -46,6 +46,10 @@ These are To-Do items:
 
 4. {% clearfix %} template tag, outputs <div class="clearfix">.</div>.
 
+5. Automatically put a Wikipedia link of every single page to that page's topic.
+
+6. Make it a TINY BIT more beautiful.
+
 
 #================================= Resources ==================================#
 

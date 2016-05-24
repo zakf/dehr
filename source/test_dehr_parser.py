@@ -38,6 +38,19 @@ class RegexTest(unittest.TestCase):
         self.assertEqual(mtch3.group("special"), None)
         self.assertEqual(mtch3.group("other"), "Foo bar.")
         self.assertEqual(mtch3.group("next_special"), "\n\n")
+    
+    def test_lexer_regexes3(self):
+        input = "Foo -- Bar ---- Baz."
+        mtch = token_pat.search(input)
+        self.assertEqual(mtch.group("special"), None)
+        
+        input2 = "Foo -- Bar ----- Baz."
+        mtch2 = token_pat.search(input2)
+        self.assertEqual(mtch2.group("next_special"), "-----")
+        
+        input3 = "Foo -- Bar -------- Baz."
+        mtch3 = token_pat.search(input3)
+        self.assertEqual(mtch3.group("next_special"), "--------")
 
 
 class LexerTest(unittest.TestCase):
