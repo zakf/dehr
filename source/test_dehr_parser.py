@@ -51,6 +51,15 @@ class RegexTest(unittest.TestCase):
         input3 = "Foo -- Bar -------- Baz."
         mtch3 = token_pat.search(input3)
         self.assertEqual(mtch3.group("next_special"), "--------")
+    
+    def test_lexer_regexes4(self):
+        input = "Foo: Bar."
+        mtch = token_pat.search(input)
+        self.assertEqual(mtch.group("next_special"), ": ")
+        
+        input2 = "Foo - Bar, Baz."
+        mtch2 = token_pat.search(input2)
+        self.assertEqual(mtch2.group("next_special"), ", ")
 
 
 class LexerTest(unittest.TestCase):

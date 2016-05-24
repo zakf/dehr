@@ -35,7 +35,9 @@ special_tokens = r"""
     
     (?:<)|              # The opening of an HTML tag
     (?:\n\n)|           # Two newlines in a row
-    (?:[-]{5,})         # Five or more hyphens in a row
+    (?:[-]{5,})|        # Five or more hyphens in a row
+    (?:,\ )|            # Matches ', ' for ValueListNodes
+    (?:\:\ )            # Matches ': ' for DictPairNodes
     
     # NOTE: It does NOT end in a | (OR).
 """
@@ -373,6 +375,63 @@ class TitleNode(Node):
     
     def render(self):
         self.output = ['<h1>', self.title, '</h1>']
+
+
+class ValueNode(Node):
+    """A special terminal node
+    
+    This is ONE value in the list of values that makes of a ValueListNode.
+    
+    Attributes:
+        value:      String, NOT a list of strings, ideally no leading or 
+                    trailing space characters, probably no commas.
+    
+    """
+    
+    def parse(self):
+        self.children = None
+        self.value = ''.join(self.input)
+    
+    def render(self):
+        pass
+    
+    @property
+    def output(self):
+        raise ParserError(
+            "Unlike most Node objects, ValueNode instances do NOT "
+            "have a node.output attribute. Do not attempt to use it.")
+
+
+class ValueListNode(Node):
+    """A nonterminal node
+    
+    Matches each ValueNode in a comma separated list like this:
+    
+    "First, second, third"  -->  ["First", "second", "third"]
+    
+    """
+    
+    def parse(self):
+        self.children = []
+        while self.input:
+            self.parse_chunk()
+        for child in self.children:
+            child.parse()
+    
+    def parse_chunk(self):
+        if ', ' in self.input:
+            # This contains two or more OneLineNodes.
+            break_index = self.input.index('\n\n')
+            first_child = OneLineNode(self.input[:break_index])
+            second_child = TerminalNode([self.input[break_index]])
+            self.children.append(first_child)
+            self.children.append(second_child)
+            next_index = break_index + 1
+            self.input = self.input[next_index:]
+        else:
+            # This contains exactly one OneLineNode.
+            self.children.append(OneLineNode(self.input))
+            self.input = []
 
 
 class WholePageNode(Node):
