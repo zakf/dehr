@@ -55,6 +55,8 @@ These are To-Do items:
 
 8. Put it on GitHub.
 
+9. {% indent %} makes <div class="indent"> and {% endindent %} similarly.
+
 
 #================================= Resources ==================================#
 

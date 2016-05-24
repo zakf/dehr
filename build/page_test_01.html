@@ -7,7 +7,7 @@
 <title>DEHR: This Is the Page Title</title>
 
 <link rel="stylesheet" type="text/css" 
-href="base_style.css" /> <!-- TODO this loads nothing -->
+href="base_style.css" />
 
 <script language="javascript" type="text/javascript" 
 src="js/jquery-2.1.4.min.js"></script> <!-- TODO this loads nothing -->
@@ -39,7 +39,17 @@ src="js/jquery-2.1.4.min.js"></script> <!-- TODO this loads nothing -->
 
 
 
-<h1>This Is the Page Title</h1>
+<div class="header">
+    <span class="header_dehr">DEHR:</span>
+    Drug Education and Harm Reduction
+</div> <!-- div.header -->
+
+
+<div class="content_box">
+
+<h1 class="page_title">This Is the Page Title</h1>
+
+<div class="indent">
 
 <p>
 This is the first paragraph of contents in the file page_test_01.html.
@@ -49,7 +59,11 @@ This is the first paragraph of contents in the file page_test_01.html.
 This is the second paragraph.
 </p>
 
+</div> <!-- div.indent -->
+
 <h2>This Is a Heading:</h2>
+
+<div class="indent">
 
 <p>
 The heading above should NOT be wrapped in &lt;p&gt; tags.
@@ -105,6 +119,10 @@ That's awesome, see how it is possible to use Django template syntax directly in
 <p>
 Final paragraph, have a nice day.
 </p>
+
+</div> <!-- div.indent -->
+
+</div> <!-- div.content_box -->
 
 
 

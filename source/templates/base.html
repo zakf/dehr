@@ -10,8 +10,18 @@
 
 {% block base_content %}
 
-<h1>{{ page_title|safe }}</h1>
+<div class="header">
+    <span class="header_dehr">DEHR:</span>
+    Drug Education and Harm Reduction
+</div> <!-- div.header -->
+
+
+<div class="content_box">
+
+<h1 class="page_title">{{ page_title|safe }}</h1>
 
 {{ page_content|safe }}
+
+</div> <!-- div.content_box -->
 
 {% endblock base_content %}
