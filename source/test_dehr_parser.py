@@ -50,7 +50,7 @@ class RegexTest(unittest.TestCase):
         
         input3 = "Foo -- Bar -------- Baz."
         mtch3 = token_pat.search(input3)
-        self.assertEqual(mtch3.group("next_special"), "--------")
+        self.assertEqual(mtch3.group("next_special"), "-----")
     
     def test_lexer_regexes4(self):
         input = "Foo: Bar."
@@ -169,6 +169,12 @@ Third.
     
     def test_parser4(self):
         input = """This Is the Title
+
+Key1: Value1A, Value1B.
+
+Key2: Value2A, Value2B.
+
+-----
 
 First paragraph here.
 

@@ -36,7 +36,7 @@ special_tokens = r"""
     
     (?:<)|              # The opening of an HTML tag
     (?:\n\n)|           # Two newlines in a row
-    (?:[-]{5,})|        # Five or more hyphens in a row
+    (?:[-]{5})|         # Exactly five hyphens in a row
     (?:,\ )|            # Matches ', ' for ValueListNodes
     (?:\:\ )            # Matches ': ' for DictPairNodes
     
@@ -564,12 +564,22 @@ class WholePageNode(Node):
         title:      String, NOT a list of strings, NO <h1> tags, copied from 
                     the TitleNode child.
         
+        meta_dict:  OrderedDict, each item is a key (string) and a list of 
+                    values (list of strings).
+        
         content:    String, NOT a list of strings, ready to be passed to 
                     the Django template engine. Does NOT include the title.
     
     """
     
+    def easy_error(self, msg_str):
+        raise ParserError(
+            "WholePageNode.parse() failed because of invalid syntax in the "
+            "input file. The offending input file starts like this:\n\n%s "
+            "\n\nThe error was this:\n\n%s" % (self.input_str[0:60], msg_str))
+    
     def parse(self):
+        self.input_str = ''.join(self.input)
         self.children = []
         if '\n\n' in self.input:
             break_index = self.input.index('\n\n')
@@ -578,17 +588,35 @@ class WholePageNode(Node):
             self.children.append(title_node)
             self.children.append(second_child)
             next_index = break_index + 1
-            third_child = MultiParagraphNode(self.input[next_index:])
-            self.children.append(third_child)
+            self.input = self.input[next_index:]
         else:
-            input_str = ''.join(self.input)
-            raise ParserError(
-                "WholePageNode.parse() failed because there is no token "
-                "with two newlines in a row. The offending file starts "
-                "with this:\n\n%s" % input_str[0:60])
+            self.easy_error("There is no token with two newlines in a row.")
+        
+        if '-----' in self.input:
+            break_index = self.input.index('-----')
+            if self.input[break_index-1] == '\n\n':
+                # This is correct.
+                pass
+            else:
+                self.easy_error("The ----- token is NOT preceded by [LF][LF].")
+            if self.input[break_index+1] == '\n\n':
+                # This is correct.
+                pass
+            else:
+                self.easy_error("The ----- token is NOT followed by [LF][LF].")
+            meta_dict_node = MetaDictNode(self.input[:(break_index-1)])
+            self.children.append(meta_dict_node)
+            self.input = self.input[(break_index+2):]
+        else:
+            self.easy_error("There is no token with five hyphens in a row.")
+        
+        multi_paragraph_node = MultiParagraphNode(self.input)
+        self.children.append(multi_paragraph_node)
+        
         for child in self.children:
             child.parse()
         self.title = self.children[0].title
+        self.meta_dict = self.children[2].meta_dict
     
     def render(self):
         """This is an UNUSUAL render() method
@@ -597,17 +625,19 @@ class WholePageNode(Node):
         
         """
         
-        if len(self.children) != 3:
-            input_str = ''.join(self.input)
-            raise ParserError(
-                "WholePageNode.render() failed because there are not "
-                "exactly three nodes. The three nodes should be the "
-                "TitleNode, then [LF][LF], then exactly one "
-                "MultiParagraphNode. The offending file starts "
-                "with this:\n\n%s" % input_str[0:60])
+        if len(self.children) != 4:
+            if self.input_str:
+                self.easy_error(
+                    "WholePageNode should have exactly 4 child Nodes, but "
+                    "it did not. It has %s child Nodes." % len(self.children))
+            else:
+                raise ParserError(
+                    "You must call WholePageNode.parse() before attempting "
+                    "to call WholePageNode.render().")
         
         # self.title has already been set.
-        content_node = self.children[2]     # Ignore the first two nodes.
+        # self.meta_dict has already been set.
+        content_node = self.children[3]     # Ignore the first 3 nodes.
         content_node.render()
         self.content = ''.join(content_node.output)
     
