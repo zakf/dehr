@@ -246,6 +246,88 @@ Third paragraph, end of file.
             OrderedDict([
                 ('Key1', ['Value1A', 'Value1B']),
                 ('Key2', ['Value2A', 'Value2B'])]))
+    
+    def test_parser5(self):
+        """This tests a TON of stuff at once
+        
+        This tests the behavior of <nop> and {% indent %} with respect to whether they get wrapped in <p> tags.
+        
+        Notice that KeyA's value ends in a period but KeyB's value does NOT.
+        
+        This tests almost every aspect of the lexer and parser.
+        
+        """
+        
+        input = """Test Parser 5 Title
+
+KeyA: ValueA1, Foo.
+
+KeyB: ValueB1, Bar
+
+-----
+
+First, gets P tags.
+
+<nop>Second, NO P tags. Begin NOP: <nop> <-- Do you see the NOP?
+
+{% load nothing %}
+
+{% indent %}
+
+{% endindent %}
+
+{% indent %}Foobarbaz.
+
+\<b>This</b> DOES get P tags.
+
+<b>This</b> does NOT get P tags.
+
+<h2>Heading, not a paragraph</h2>
+
+Third paragraph, end of file.
+
+"""
+        tokens = lexer(input)
+        node = WholePageNode(tokens)
+        node.parse()
+        node.render()
+        with self.assertRaisesRegexp(ParserError, 'have a node\.output'):
+            node.output
+        self.assertEqual(node.title, 'Test Parser 5 Title')
+        self.assertEqual(node.content, """<p>
+First, gets P tags.
+</p>
+
+Second, NO P tags. Begin NOP: <nop> <-- Do you see the NOP?
+
+<p>
+{% load nothing %}
+</p>
+
+{% indent %}
+
+{% endindent %}
+
+{% indent %}Foobarbaz.
+
+<p>
+<b>This</b> DOES get P tags.
+</p>
+
+<b>This</b> does NOT get P tags.
+
+<h2>Heading, not a paragraph</h2>
+
+<p>
+Third paragraph, end of file.
+</p>""")
+        
+        meta_dict = node.meta_dict
+        self.assertEqual(
+            meta_dict,
+            OrderedDict([
+                ('KeyA', ['ValueA1', 'Foo']),
+                ('KeyB', ['ValueB1', 'Bar'])]))
 
 
 #============================== If Name Is Main ===============================#
