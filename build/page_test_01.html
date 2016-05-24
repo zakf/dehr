@@ -49,9 +49,7 @@ src="js/jquery-2.1.4.min.js"></script> <!-- TODO this loads nothing -->
 
 <h1 class="page_title">This Is the Page Title</h1>
 
-<p>
 <div class="indent">
-</p>
 
 <p>
 This is the first paragraph of contents in the file page_test_01.html.
@@ -120,6 +118,40 @@ That's awesome, see how it is possible to use Django template syntax directly in
 
 <p>
 Final paragraph, have a nice day.
+</p>
+
+</div> <!-- div.indent -->
+
+<h2>Rigorous Testing of the Lexer and Parser</h2>
+
+<div class="indent">
+
+<p>
+This should be wrapped in &lt;p&gt; tags and indented.
+</p>
+
+<div class="indent">
+
+<p>
+This should be wrapped in &lt;p&gt; tags and indented <b>even more.</b>
+</p>
+
+</div> <!-- div.indent -->
+
+<p>
+This should be wrapped in &lt;p&gt; tags and indented.
+</p>
+
+This line starts with &lt;nop&gt; and should NOT have P tags.
+
+<b>You cannot</b> tell that this is a new paragraph in the source file, it lacks P tags. This sentence and the two prior sentences (three sentences total) all look like one paragraph in a browser.
+
+<p>
+<b>This</b> will appear as a new paragraph.
+</p>
+
+<p>
+The phrase <nop> (NOP) inside a paragraph is NOT taken out by the parser, but it is a meaningless HTML tag so it is invisible in a web browser.
 </p>
 
 </div> <!-- div.indent -->

@@ -104,6 +104,39 @@ class LexerTest(unittest.TestCase):
         input = "This Is the Title\n\nFirst.\r\n\r\nSecond."
         with self.assertRaises(CrCharacterError):
             tokens = lexer(input)
+    
+    def test_lexer_for_tags(self):
+        input = "Foo.\n\n{% indent %}\n\nBar."
+        tokens = lexer(input)
+        self.assertEqual(tokens, [
+            'Foo.',
+            '\n\n',
+            '{% indent %}',
+            '\n\n',
+            'Bar.'])
+    
+    def test_lexer_for_tags2(self):
+        input = "Foo.\n\n{% endindent %}\n\nBar."
+        tokens = lexer(input)
+        self.assertEqual(tokens, [
+            'Foo.',
+            '\n\n',
+            '{% endindent %}',
+            '\n\n',
+            'Bar.'])
+    
+    def test_lexer_for_nop(self):
+        input = "Foo.\n\n<nop>Bar.<b>Baz.</b>"
+        tokens = lexer(input)
+        self.assertEqual(tokens, [
+            'Foo.',
+            '\n\n',
+            '<nop>',
+            'Bar.',
+            '<',
+            'b>Baz.',
+            '<',
+            '/b>'])
 
 
 class ParserTest(unittest.TestCase):

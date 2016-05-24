@@ -10,12 +10,12 @@ This is the first paragraph of contents in the file page_test_01.html.
 
 This is the second paragraph.
 
-</div> <!-- div.indent -->
+{% endindent %}
 
 
 <h2>This Is a Heading:</h2>
 
-<div class="indent">
+{% indent %}
 
 The heading above should NOT be wrapped in &lt;p&gt; tags.
 
@@ -53,4 +53,29 @@ That's awesome, see how it is possible to use Django template syntax directly in
 
 Final paragraph, have a nice day.
 
-</div> <!-- div.indent -->
+{% endindent %}
+
+
+<h2>Rigorous Testing of the Lexer and Parser</h2>
+
+{% indent %}
+
+This should be wrapped in &lt;p&gt; tags and indented.
+
+{% indent %}
+
+This should be wrapped in &lt;p&gt; tags and indented <b>even more.</b>
+
+{% endindent %}
+
+This should be wrapped in &lt;p&gt; tags and indented.
+
+<nop>This line starts with &lt;nop&gt; and should NOT have P tags.
+
+<b>You cannot</b> tell that this is a new paragraph in the source file, it lacks P tags. This sentence and the two prior sentences (three sentences total) all look like one paragraph in a browser.
+
+\<b>This</b> will appear as a new paragraph.
+
+The phrase <nop> (NOP) inside a paragraph is NOT taken out by the parser, but it is a meaningless HTML tag so it is invisible in a web browser.
+
+{% endindent %}

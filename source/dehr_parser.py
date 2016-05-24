@@ -31,6 +31,7 @@ special_tokens = r"""
     
     (?:\\<)|            # Matches "\<", which is an escaped <
     (?:\\[\n]{2})|      # Matches "\[LF][LF]"
+    (?:<nop>)|          # Matches "<nop>", do Ctrl-F "nop" for details
     
     # Next, we search for unescaped special sequences:
     
@@ -38,7 +39,9 @@ special_tokens = r"""
     (?:\n\n)|           # Two newlines in a row
     (?:[-]{5})|         # Exactly five hyphens in a row
     (?:,\ )|            # Matches ', ' for ValueListNodes
-    (?:\:\ )            # Matches ': ' for DictPairNodes
+    (?:\:\ )|           # Matches ': ' for DictPairNodes
+    (?:\{%\ indent\ %\})|
+    (?:\{%\ endindent\ %\})
     
     # NOTE: It does NOT end in a | (OR).
 """
@@ -86,6 +89,8 @@ MultiParagraphNode  -->  OneLineNode  ('\n\n'  MultiParagraphNode)?
 OneLineNode  -->  '<'  NonParagraphLineNode         # Do NOT wrap in <p> tags
 
 OneLineNode  -->  '\<'  OneParagraphNode            # DO wrap in <p> tags
+
+OneLineNode  -->  '<nop>'  NonParagraphLineNode     # Do NOT wrap in <p> tags
 
 OneLineNode  -->  OneParagraphNode                  # DO wrap in <p> tags
 
@@ -281,6 +286,9 @@ def unescape_double_newline(input_token_list):
     return clean_token_list
 
 
+NON_P_TOKENS = ['{% indent %}', '{% endindent %}']
+ALL_NON_P_TOKENS = ['<', '<nop>', '{% indent %}', '{% endindent %}']
+
 class OneLineNode(Node):
     """A nonterminal node
     
@@ -291,9 +299,30 @@ class OneLineNode(Node):
     """
     
     def parse(self):
-        if self.input[0] == '<':
+        if self.input[0] in ALL_NON_P_TOKENS:
             # This is a NonParagraphLineNode.
-            self.children = [TerminalNode(['<'])]
+            # This will NOT be wrapped in <p> tags.
+            # 
+            # The NOP in <nop> stands for "no P tags", but it also stands 
+            # for "no op", which is also valid. Using <nop> means there will 
+            # be no <p> tags (no p), but the <nop> itself will be deleted 
+            # from the output, which is similar to a no op operation on a CPU 
+            # or in a programming language. The no op (nop) code in Python 
+            # is 'pass', and in C it is a semicolon.
+            
+            if self.input[0] == '<':
+                self.children = [TerminalNode(['<'])]
+            elif self.input[0] == '<nop>':
+                # Discard the string '<nop>'
+                self.children = []
+            elif self.input[0] in NON_P_TOKENS:
+                self.children = [TerminalNode([self.input[0]])]
+                if len(self.input) == 1:
+                    self.input.append('')
+                    # We need filler for the NonParagraphLineNode.
+            else:
+                raise ParserError(
+                    "This code should be unreachable.")
             child_input = unescape_double_newline(self.input[1:])
             self.children.append(NonParagraphLineNode(child_input))
         
