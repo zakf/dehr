@@ -6,6 +6,7 @@
 #     ~/progs/zml/trunk/zml/parser.py
 
 import re
+from collections import OrderedDict
 
 from dehr_helpers import *
 
@@ -409,29 +410,149 @@ class ValueListNode(Node):
     
     "First, second, third"  -->  ["First", "second", "third"]
     
+    Attributes:
+        value_list:     List of strings in order.
+    
     """
     
     def parse(self):
         self.children = []
+        self.value_list = []
         while self.input:
             self.parse_chunk()
         for child in self.children:
             child.parse()
+            self.value_list.append(child.value)
     
     def parse_chunk(self):
         if ', ' in self.input:
-            # This contains two or more OneLineNodes.
-            break_index = self.input.index('\n\n')
-            first_child = OneLineNode(self.input[:break_index])
-            second_child = TerminalNode([self.input[break_index]])
-            self.children.append(first_child)
-            self.children.append(second_child)
+            # This contains two or more ValueNodes.
+            break_index = self.input.index(', ')
+            new_child = ValueNode(self.input[:break_index])
+            self.children.append(new_child)
             next_index = break_index + 1
             self.input = self.input[next_index:]
         else:
-            # This contains exactly one OneLineNode.
-            self.children.append(OneLineNode(self.input))
+            # This contains exactly one ValueNode.
+            remainder = ''.join(self.input)
+            if remainder[-1] == '.':
+                # If there is a period at the end, remove it.
+                remainder = remainder[:-1]
+            self.children.append(ValueNode(remainder))
             self.input = []
+    
+    def render(self):
+        pass
+    
+    @property
+    def output(self):
+        raise ParserError(
+            "Unlike most Node objects, ValueListNode instances do NOT "
+            "have a node.output attribute. Do not attempt to use it.")
+
+
+class KeyNode(Node):
+    """A special type of terminal node
+    
+    Attributes:
+        key:        String, NOT a list of strings.
+    
+    """
+    
+    def parse(self):
+        self.children = None
+        self.key = ''.join(self.input)
+    
+    def render(self):
+        pass
+    
+    @property
+    def output(self):
+        raise ParserError(
+            "Unlike most Node objects, KeyNode instances do NOT "
+            "have a node.output attribute. Do not attempt to use it.")
+
+
+class DictPairNode(Node):
+    """A special type of nonterminal node
+    
+    Attributes:
+        key:            KeyNode.key
+        
+        value_list:     ValueListNode.value_list
+    
+    """
+    
+    def parse(self):
+        self.children = []
+        if ': ' in self.input:
+            break_index = self.input.index(': ')
+            key_node = KeyNode(self.input[:break_index])
+            next_index = break_index + 1
+            value_list_node = ValueListNode(self.input[next_index:])
+            self.children.append(key_node)
+            self.children.append(value_list_node)
+        else:
+            input_str = ''.join(self.input)
+            raise ParserError(
+                "DictPairNode.parse() failed because there is no token with "
+                "a colon followed by a space in the input. The offending "
+                "input is:\n\n%r" % input_str[0:60])
+        for child in self.children:
+            child.parse()
+        self.key = self.children[0].key
+        self.value_list = self.children[1].value_list
+    
+    def render(self):
+        pass
+    
+    @property
+    def output(self):
+        raise ParserError(
+            "Unlike most Node objects, DictPairNode instances do NOT "
+            "have a node.output attribute. Do not attempt to use it.")
+
+
+class MetaDictNode(Node):
+    """A special type of nonterminal node
+    
+    Matches a sequence of one or more DictPairNodes.
+    
+    Attributes:
+        meta_dict:      OrderedDict of key - value_list pairs.
+    
+    """
+    
+    def parse(self):
+        self.children = []
+        self.meta_dict = OrderedDict()
+        while self.input:
+            self.parse_chunk()
+        for child in self.children:
+            child.parse()
+            self.meta_dict[child.key] = child.value_list
+    
+    def parse_chunk(self):
+        if '\n\n' in self.input:
+            # This contains two or more DictPairNodes.
+            break_index = self.input.index('\n\n')
+            new_child = DictPairNode(self.input[:break_index])
+            self.children.append(new_child)
+            next_index = break_index + 1
+            self.input = self.input[next_index:]
+        else:
+            # This contains exactly one DictPairNode.
+            self.children.append(DictPairNode(self.input))
+            self.input = []
+    
+    def render(self):
+        pass
+    
+    @property
+    def output(self):
+        raise ParserError(
+            "Unlike most Node objects, MetaDictNode instances do NOT "
+            "have a node.output attribute. Do not attempt to use it.")
 
 
 class WholePageNode(Node):
