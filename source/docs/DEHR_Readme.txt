@@ -50,6 +50,11 @@ These are To-Do items:
 
 6. Make it a TINY BIT more beautiful.
 
+7. Make it compatible with both Python 3.x and Python 2.7.x, see here:
+   http://stackoverflow.com/questions/5937251/
+
+8. Put it on GitHub.
+
 
 #================================= Resources ==================================#
 
