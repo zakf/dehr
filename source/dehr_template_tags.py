@@ -60,5 +60,5 @@ def wiki(target, display=None):
     if not display:
         display = target
     url_str = WIKI_URL % target
-    html_str = '<a href="%s">%s</a>' % (url_str, display)
+    html_str = '<a target="_blank" href="%s">%s</a>' % (url_str, display)
     return mark_safe(html_str)
