@@ -79,3 +79,20 @@ This should be wrapped in &lt;p&gt; tags and indented.
 The phrase <nop> (NOP) inside a paragraph is NOT taken out by the parser, but it is a meaningless HTML tag so it is invisible in a web browser.
 
 {% endindent %}
+
+
+<h2>Testing the Custom Template Tags</h2>
+
+{% indent %}
+
+\<b>Simple Tag Examples:</b>
+<br />
+First example, only one argument: {% wiki 'puffer fish' %}.
+<br />
+Second example, {% wiki 'lederhosen' 'this has two arguments' %}, the first is the target (the Wikipedia page title) and the second is the displayed text.
+
+Here is a {% old_wiki 'lobster' 'link about lobsters' %} on Wikipedia. The prior link used the <tt>old_wiki</tt> tag.
+
+Did you know that {% wiki 'Pluto (mythology)' 'Pluto' %} is a Greek god but is <i>not</i> a planet? I think that is a terrible dishonor. Also, this paragraph uses the newer <tt>wiki</tt> tag.
+
+{% endindent %}
