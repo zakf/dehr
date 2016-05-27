@@ -12,3 +12,7 @@ class DehrError(Exception):
             return "%s:\n%s" % (self.description, self.more)
         else:
             return self.description
+
+
+class UrlLookupError(DehrError):
+    pass

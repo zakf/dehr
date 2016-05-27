@@ -17,6 +17,8 @@
 from django import template
 from django.utils.safestring import mark_safe
 
+from dehr_helpers import *
+
 register = template.Library()
 
 
@@ -60,10 +62,46 @@ def old_wiki(target, display=None):
 def wiki(target, display=None):
     """Include a link to Wikipedia
     
+    Examples:
+        {% wiki "heroin" %}
+        
+        {% wiki "heroin" "the drug known as smack" %}
+    
     """
     
     if not display:
         display = target
     url_str = WIKI_URL % target
     html_str = '<a target="_blank" href="%s">%s</a>' % (url_str, display)
+    return mark_safe(html_str)
+
+
+@register.simple_tag(takes_context=True)
+def link(context, target, display=None):
+    """Include a link to another page on DEHR
+    
+    Arguments:
+        context:    The Context object passed to the Template object.
+                    Its type is django.template.context.Context.
+        
+        target:     String, this will be used to look up the page.
+        
+        display:    String, optional, this will be visible to the user.
+    
+    Examples:
+        {% link "heroin" %}
+        
+        {% link "heroin" "the drug known as smack" %}
+    
+    """
+    
+    if not display:
+        display = target
+    apd = context['apd']
+    try:
+        url_str = apd.find_url(target)
+    except UrlLookupError:
+        html_str = '<u>%s [broken link]</u>' % display
+    else:
+        html_str = '<a href="%s">%s</a>' % (url_str, display)
     return mark_safe(html_str)

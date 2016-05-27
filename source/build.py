@@ -21,9 +21,6 @@ import dehr_parser
 class BuildError(DehrError):
     pass
 
-class UrlLookupError(DehrError):
-    pass
-
 
 build_file_path = os.path.abspath(__file__)
 # build_file_path == '/Users/zakf/progs/dehr/source/build.py'
@@ -436,6 +433,7 @@ def compile_one_page(base_dir, engine, apd, page_filename):
     
     template_object = engine.from_string(template_str)
     context_object = Context({
+        'apd': apd,
         'page_title': wpn.title,
         # 'page_content': wpn.content,  # Now I do this manually, see above.
         'page_type': page_type,
