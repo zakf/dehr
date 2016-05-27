@@ -406,6 +406,11 @@ def compile_one_page(base_dir, engine, apd, page_filename):
     related_names = get_list_or_empty('Related names')
     for related_name in related_names:
         apd.add_alias(related_name, page_filename)
+    # Hidden names do NOT appear on the final HTML page, but they are useful 
+    # for redirects, they ARE seen by {% link %} during lookup.
+    hidden_names = get_list_or_empty('Hidden names')
+    for hidden_name in hidden_names:
+        apd.add_alias(hidden_name, page_filename)
     
     neurotransmitters = get_list_or_empty('Neurotransmitters')
     

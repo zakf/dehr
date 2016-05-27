@@ -49,11 +49,19 @@
         
         {% include "metadata_line.html" with key="Brand names" value_list=brand_names %}
         
+        {% include "metadata_line.html" with key="Related names" value_list=related_names %}
+        
         {% include "metadata_line.html" with key="Drug class" value_list=drug_class %}
         
         {% include "metadata_line.html" with key="Mechanisms" value_list=mechanisms %}
         
         {% include "metadata_line.html" with key="Neurotransmitters" value_list=neurotransmitters %}
+        
+        {% if related_names %}
+            <div class="metadata_box_line">
+                <b>* Note 1:</b> The related names above <i>may not</i> refer specifically to the topic of this page, they are only related. They may be slang terms which are ill-defined. They may be more specific or more broad than the page title.
+            </div>
+        {% endif %}
         
     </div> <!-- div.metadata_box -->
     
