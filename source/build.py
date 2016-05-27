@@ -279,9 +279,15 @@ class AllPageData(object):
         apd_file.close()
         print "Saved the AllPageData.next object to all_page_data.py."
     
-    def populate_prior(self, base_dir):
+    def load_prior(self, base_dir):
         """Populate self using the all_page_data.py file"""
-        # TODO actually populate self.prior using a Python file.
+        apd_filepath = os.path.join(base_dir, 'source', 'all_page_data.py')
+        apd_file = open(apd_filepath, 'rb')
+        apd_str = apd_file.read()
+        apd_file.close()
+        exec(apd_str)
+        self.prior.titles = all_page_titles
+        self.prior.aliases = all_page_aliases
         self.prior.read_only = True
     
     def add_title(self, title, page_filename):
@@ -457,9 +463,9 @@ if __name__ == '__main__':
         # compile_one_page(BASE_DIR, engine, 'page_test_01.html')
         
         apd = AllPageData()
+        apd.load_prior(BASE_DIR)
         pages_dir = os.path.join(BASE_DIR, 'source', 'pages')
         for page_filename in sorted(os.listdir(pages_dir)):
             if page_filename[-5:] == '.html':
                 compile_one_page(BASE_DIR, engine, apd, page_filename)
-        
         apd.save_next(BASE_DIR)
