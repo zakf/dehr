@@ -21,6 +21,9 @@ import dehr_parser
 class BuildError(DehrError):
     pass
 
+class UrlLookupError(DehrError):
+    pass
+
 
 build_file_path = os.path.abspath(__file__)
 # build_file_path == '/Users/zakf/progs/dehr/source/build.py'
@@ -167,6 +170,32 @@ class AllPageDataPart(object):
         self.titles = OrderedDict()
         self.aliases = OrderedDict()
         self.read_only = read_only
+    
+    def add_title(self, title, page_filename):
+        if self.read_only:
+            raise BuildError("READ ONLY, you may not do this.")
+        self.titles[title] = page_filename
+    
+    def add_alias(self, alt_name, page_filename):
+        """This FORCES LOWERCASE as it adds the alt_name"""
+        if self.read_only:
+            raise BuildError("READ ONLY, you may not do this.")
+        self.aliases[alt_name.lower()] = page_filename
+    
+    def get_titles(self):
+        """Returns all keys from self.titles as a SORTED list of strings
+        
+        The OrdereDict self.titles is sorted by page_filename, which is not very useful when generating a list that a human will see. This returns a list of strings (just titles, no page_filenames) that is sorted by the human-readable title.
+        
+        """
+        
+        all_titles = []
+        # The following line, with list() and .items(), ensures the SAME exact 
+        # behavior in both Python 2.7.x and 3.x:
+        unsorted_titles = list(self.titles.items())
+        for title, page_filename in unsorted_titles:
+            all_titles.append(title)
+        return sorted(all_titles)
 
 
 class AllPageData(object):
@@ -216,17 +245,45 @@ class AllPageData(object):
     
     """
     
-    def __init__(self, base_dir):
+    def __init__(self):
+        self.prior = AllPageDataPart(False)
+        self.next = AllPageDataPart(False)
+    
+    def make_prior(self, base_dir):
         """Populate self using the all_page_data.py file"""
-        
-        self.prior = AllPageDataPart()
-        self.next = AllPageDataPart()
-        
         # TODO actually populate self.prior using a Python file.
+        self.prior.read_only = True
+    
+    def add_title(self, title, page_filename):
+        self.next.add_title(title, page_filename)
+    
+    def add_alias(self, alt_name, page_filename):
+        self.next.add_alias(alt_name, page_filename)
+    
+    def get_titles(self):
+        return self.prior.get_titles()
+    
+    def find_url(self, alt_name):
+        """This will be used by the {% link %} custom template tag
         
-        # Leave these empty, they will be filled as the pages are rendered:
-        self.next.titles = OrderedDict()
-        self.next.aliases = OrderedDict()
+        alt_name is a string like "Lexapro" or "S-citalopram", not necessarily lowercase. It will be forced into lowercase before the lookup occurs.
+        
+        Input example: "Lexapro"
+        
+        Output example: "lexapro.html"
+        
+        """
+        
+        alt_name_lowercase = alt_name.lower()
+        page_filename = self.prior.aliases.get(alt_name_lowercase, None)
+        if page_filename == None:
+            # The alias alt_name is NOT in the list, lookup failed.
+            raise UrlLookupError(
+                "The search term '%s' did not match any aliases in "
+                "AllPageData.prior.aliases. You may need to run build.py "
+                "once more, because it uses an old cached list of aliases. "
+                "Alternatively, look at all_page_data.py." % alt_name)
+        return page_filename
 
 
 def compile_one_page(base_dir, engine, apd, page_filename):
