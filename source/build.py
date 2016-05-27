@@ -149,6 +149,86 @@ $                       # Matches the end of the string.
 """)
 
 
+class AllPageDataPart(object):
+    """Holds all the page titles, page URLs, and page aliases
+    
+    See AllPageData for more information.
+    
+    Attributes:
+        read_only:      Boolean, iff True then you SHOULD NOT edit this object.
+    
+    """
+    
+    def __init__(self, read_only):
+        if not (type(read_only) is bool):
+            raise BuildError(
+                "The AllPageDataPart constructor NEEDS a Boolean for the one "
+                "and only argument.")
+        self.titles = OrderedDict()
+        self.aliases = OrderedDict()
+        self.read_only = read_only
+
+
+class AllPageData(object):
+    """Holds all the page titles, page URLs, and page aliases
+    
+    This object is used by the {% link %} custom template tag.
+    
+    This object is also used in index.html to create a list of all the pages, by title.
+    
+    Attributes:
+        prior.titles:   OrderedDict, one-to-one map from human-readable titles 
+                        to page filenames. This is used to create a list of all pages. See example below.
+                        
+                        We do NOT force lowercase, we use proper case.
+                        
+                        We do NOT have duplicates, there is exactly one entry for each page. Every value is unique.
+        
+        prior.aliases:  OrderedDict, many-to-one map from aliases to page 
+                        filenames. This is used by the {% link %} tag during lookups. See example below.
+                        
+                        We FORCE LOWERCASE in the keys. Thus, "Lexapro" may not appear as a key, it must be "lexapro". This is to facilitate lookups.
+                        
+                        We have TONS OF DUPLICATES. Thus, "lexapro", "cipralex", "s-citalopram", and "escitalopram" are four separate keys but they all have the same value, "lexapro.html".
+        
+        next.titles:    Similar to prior.titles, but this is created during 
+                        rendering. Next time build.py runs, this will be used as prior.titles.
+        
+        next.aliases:   Similar to prior.aliases.
+    
+    Examples:
+        
+        prior.titles = OrderedDict([
+            ('Cocaine', 'cocaine.html'),
+            ('Escitalopram (Lexapro)', 'lexapro.html'),
+            ('Sertraline (Zoloft)', 'zoloft.html'),
+        ])
+        
+        prior.aliases = OrderedDict([
+            ('cipralex', 'lexapro.html'),
+            ('escitalopram', 'lexapro.html'),
+            ('lexapro', 'lexapro.html'),
+            ('s-citalopram', 'lexapro.html'),   # We forced LOWERCASE
+            ('cocaine', 'cocaine.html'),
+            ('coke', 'cocaine.html'),
+            ('methyl benzoyl ecgonine', 'cocaine.html'),
+        ])
+    
+    """
+    
+    def __init__(self, base_dir):
+        """Populate self using the all_page_data.py file"""
+        
+        self.prior = AllPageDataPart()
+        self.next = AllPageDataPart()
+        
+        # TODO actually populate self.prior using a Python file.
+        
+        # Leave these empty, they will be filled as the pages are rendered:
+        self.next.titles = OrderedDict()
+        self.next.aliases = OrderedDict()
+
+
 def compile_one_page(base_dir, engine, apd, page_filename):
     """Compile and save one HTML file
     
@@ -278,7 +358,8 @@ if __name__ == '__main__':
         # template_test03(engine)
         # compile_one_page(BASE_DIR, engine, 'page_test_01.html')
         
+        apd = AllPageData()
         pages_dir = os.path.join(BASE_DIR, 'source', 'pages')
-        for page_filename in os.listdir(pages_dir).sort():
+        for page_filename in sorted(os.listdir(pages_dir)):
             if page_filename[-5:] == '.html':
-                compile_one_page(BASE_DIR, engine, page_filename)
+                compile_one_page(BASE_DIR, engine, apd, page_filename)

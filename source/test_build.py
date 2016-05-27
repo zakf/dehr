@@ -10,6 +10,12 @@ class InitialTest(unittest.TestCase):
         check_versions()
 
 
+class AllPageDataTest(unittest.TestCase):
+    def test_all_page_data_part_init(self):
+        with self.assertRaisesRegexp(BuildError, 'NEEDS a Boolean'):
+            AllPageDataPart(None)
+
+
 #============================== If Name Is Main ===============================#
 
 if __name__ == '__main__':
