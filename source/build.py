@@ -371,7 +371,6 @@ def compile_one_page(base_dir, engine, apd, page_filename):
     apd.add_alias(wpn.title, page_filename)
     if page_filename[-5:] == '.html':
         apd.add_alias(page_filename[:-5], page_filename)
-    # TODO add all meta_dict.generic_names and brand_names
     
     page_type = meta_dict.get('Page type', [None])[0]
     if not page_type:
@@ -394,13 +393,23 @@ def compile_one_page(base_dir, engine, apd, page_filename):
     def get_list_or_empty(key):
         return meta_dict.get(key, [])
     
-    if page_type == 'One drug':
-        brand_names = get_list_or_empty('Brand names')
-        for brand_name in brand_names:
-            apd.add_alias(brand_name, page_filename)
-        generic_names = get_list_or_empty('Generic names')
-        for generic_name in generic_names:
-            apd.add_alias(generic_name, page_filename)
+    wikipedia_name = get_str_or_none('Wikipedia name')
+    
+    ## This 'if' is unnecessary, it fails gracefully:
+    # if page_type == 'One drug':
+    brand_names = get_list_or_empty('Brand names')
+    for brand_name in brand_names:
+        apd.add_alias(brand_name, page_filename)
+    generic_names = get_list_or_empty('Generic names')
+    for generic_name in generic_names:
+        apd.add_alias(generic_name, page_filename)
+    
+    neurotransmitters = get_list_or_empty('Neurotransmitters')
+    
+    if (wikipedia_name or brand_names or generic_names or neurotransmitters):
+        has_metadata = True
+    else:
+        has_metadata = False
     
     ## Old method, cannot deal with Django template syntax in the page_file:
     # base_template = engine.get_template('base.html')
@@ -421,7 +430,13 @@ def compile_one_page(base_dir, engine, apd, page_filename):
         'page_title': wpn.title,
         # 'page_content': wpn.content,  # Now I do this manually, see above.
         'page_type': page_type,
-        'wikipedia_name': get_str_or_none('Wikipedia name'),
+        'wikipedia_name': wikipedia_name,
+        'has_metadata': has_metadata,
+        'brand_names': brand_names,
+        'generic_names': generic_names,
+        'neurotransmitters': neurotransmitters,
+        'mechanisms': get_list_or_empty('Mechanisms'),
+        'drug_class': get_list_or_empty('Drug class'),
     })
     rendered = template_object.render(context_object)
     

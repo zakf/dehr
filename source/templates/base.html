@@ -20,20 +20,61 @@
 
 <div class="content_box">
 
+
 <h1 class="page_title">{{ page_title|safe }}</h1>
+
 
 <div class="subheader">
     Page type: <b>{{ page_type }}</b>
+    
     {% ifnotequal page_type 'Index' %}
         <br />
         <a href="index.html">Home</a>
     {% endifnotequal %}
-    
-    {% if wikipedia_name %}
-        <br />
-        {% wiki wikipedia_name 'Wikipedia article' %} on {{ wikipedia_name }}
-    {% endif %}
 </div> <!-- div.subheader -->
+
+
+{% if has_metadata %}
+    <div class="metadata_box">
+        
+        <div class="metadata_box_header">Infobox:</div>
+        
+        {% if wikipedia_name %}
+            <div class="metadata_line">
+                {% wiki wikipedia_name 'Wikipedia article' %} on 
+                {{ wikipedia_name }}.
+            </div>
+        {% endif %}
+        
+        {% if generic_names %}
+            <div class="metadata_line">
+                <b>Generic names:</b>
+                {% for val in generic_names %}
+                    {% if not forloop.last %}
+                        {{ val }},
+                    {% else %}
+                        {{ val }}.
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        {% if brand_names %}
+            <div class="metadata_line">
+                <b>Brand names:</b>
+                {% for val in brand_names %}
+                    {% if not forloop.last %}
+                        {{ val }},
+                    {% else %}
+                        {{ val }}.
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+    </div> <!-- div.metadata_box -->
+{% endif %}
+
 
 {{ page_content|safe }}
 
