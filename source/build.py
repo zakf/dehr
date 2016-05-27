@@ -149,7 +149,7 @@ $                       # Matches the end of the string.
 """)
 
 
-def compile_one_page(base_dir, engine, pg_lists, page_filename):
+def compile_one_page(base_dir, engine, apd, page_filename):
     """Compile and save one HTML file
     
     Arguments:
@@ -157,8 +157,7 @@ def compile_one_page(base_dir, engine, pg_lists, page_filename):
         
         engine:         django.template.Engine object.
         
-        pg_lists:       List, [pg_list_old, pg_list_new]. Each item is an 
-                        OrderedDict with keys like "lexapro" and "escitalopram" and values like "lexapro.html" for both of the prior keys. Keys will ALWAYS be all LOWERCASE for easy lookup. The object pg_list_old is from the prior time build.py was run, and the object pg_list_new is being built currently and will be used NEXT time build.py is run.
+        apd:            AllPageData object.
         
         page_filename:  String, e.g. "lexapro.html".
     
@@ -278,20 +277,6 @@ if __name__ == '__main__':
         # template_test02(engine)
         # template_test03(engine)
         # compile_one_page(BASE_DIR, engine, 'page_test_01.html')
-        
-        pg_lists = [
-            # pg_list_old is first:
-            OrderedDict([
-                ('lexapro', 'lexapro.html'),
-                ('s-citalopram', 'lexapro.html'),   # NOTE: Forced lowercase
-                ('escitalopram', 'lexapro.html'),
-                ('cipralex', 'lexapro.html'),
-                ('zoloft', 'zoloft.html'),
-                ('sertraline', 'zoloft.html'),
-            ]),
-            
-            # pg_list_new is next and is ALWAYS blank at first:
-            OrderedDict()]
         
         pages_dir = os.path.join(BASE_DIR, 'source', 'pages')
         for page_filename in os.listdir(pages_dir).sort():
