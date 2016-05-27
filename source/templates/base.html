@@ -28,6 +28,11 @@
         <br />
         <a href="index.html">Home</a>
     {% endifnotequal %}
+    
+    {% if wikipedia_name %}
+        <br />
+        {% wiki wikipedia_name 'Wikipedia article' %} on {{ wikipedia_name }}
+    {% endif %}
 </div> <!-- div.subheader -->
 
 {{ page_content|safe }}

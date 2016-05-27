@@ -377,6 +377,31 @@ def compile_one_page(base_dir, engine, apd, page_filename):
     if not page_type:
         page_type = 'Not specified'
     
+    def get_str_or_none(key):
+        """Use this for keys which ALWAYS have just one value"""
+        value_list = meta_dict.get(key, [])
+        if len(value_list) == 1:
+            return value_list[0]
+        elif len(value_list) == 0:
+            return None
+        else:
+            raise BuildError(
+                "The meta_dict for the page '%s' is ill-formed. The key "
+                "'%s' should have NO MORE THAN ONE value. It had 2 or "
+                "more values. They are: %r" % 
+                (page_filename, key, value_list))
+    
+    def get_list_or_empty(key):
+        return meta_dict.get(key, [])
+    
+    if page_type == 'One drug':
+        brand_names = get_list_or_empty('Brand names')
+        for brand_name in brand_names:
+            apd.add_alias(brand_name, page_filename)
+        generic_names = get_list_or_empty('Generic names')
+        for generic_name in generic_names:
+            apd.add_alias(generic_name, page_filename)
+    
     ## Old method, cannot deal with Django template syntax in the page_file:
     # base_template = engine.get_template('base.html')
     
@@ -396,6 +421,7 @@ def compile_one_page(base_dir, engine, apd, page_filename):
         'page_title': wpn.title,
         # 'page_content': wpn.content,  # Now I do this manually, see above.
         'page_type': page_type,
+        'wikipedia_name': get_str_or_none('Wikipedia name'),
     })
     rendered = template_object.render(context_object)
     
