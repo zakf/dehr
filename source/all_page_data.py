@@ -7,7 +7,7 @@ all_page_titles = OrderedDict([
     ('Escitalopram (Lexapro)', 'lexapro.html'),
     ('Dextroamphetamine (Dexedrine)', 'dexedrine.html'),
     ('Welcome to the Drug Education and Harm Reduction Website', 'index.html'),
-    ('This Is the Page Title', 'test_page_01.html'),
+    ('Test Page 01 (This Is the Title)', 'test_page_01.html'),
 ])
 
 all_page_aliases = OrderedDict([
@@ -31,6 +31,6 @@ all_page_aliases = OrderedDict([
     ('cipralex', 'lexapro.html'),
     ('escitalopram', 'lexapro.html'),
     ('s-citalopram', 'lexapro.html'),
-    ('this is the page title', 'test_page_01.html'),
+    ('test page 01 (this is the title)', 'test_page_01.html'),
     ('test_page_01', 'test_page_01.html'),
 ])

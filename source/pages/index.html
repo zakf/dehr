@@ -21,6 +21,11 @@ Hopefully this website will eventually be reviewed by medical experts and lawyer
 
 {% indent %}
 
-\<a href="test_page_01.html">Test Page 01.</a>
+<nop>
+{% for page_tupe in all_pages_list %}
+    <div class="link_list_item">
+        <a href="{{ page_tupe.1 }}">{{ page_tupe.0 }}</a>
+    </div>
+{% endfor %}
 
 {% endindent %}

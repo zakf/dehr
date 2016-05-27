@@ -93,3 +93,33 @@ div.subheader {
     text-align: center;
     margin: 10px;
 }
+
+div.metadata_box, div.metadata_box_header, div.metadata_box_line {
+    background-color: #BBBBDD;
+}
+
+div.metadata_box {
+    margin: 10px 0px;
+    padding: 20px;
+    border: 1px solid black;
+    float: left;
+}
+
+div.metadata_box_header {
+    font-size: 1.4em;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+div.metadata_box_line {
+    margin-top: 5px;
+}
+
+h1.page_title_repeat {
+    font-size: 1.7em;
+    margin-top: 5px;
+}
+
+div.link_list_item {
+    margin-bottom: 8px;
+}

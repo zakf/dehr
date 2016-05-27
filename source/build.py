@@ -438,6 +438,15 @@ def compile_one_page(base_dir, engine, apd, page_filename):
         'mechanisms': get_list_or_empty('Mechanisms'),
         'drug_class': get_list_or_empty('Drug class'),
     })
+    
+    if page_type == 'Index':
+        all_pages_list = []
+        for page_title in apd.get_titles():
+            all_pages_list.append([
+                page_title,
+                apd.find_url(page_title)])
+        context_object['all_pages_list'] = all_pages_list
+    
     rendered = template_object.render(context_object)
     
     out_filepathname = os.path.join(base_dir, 'build', page_filename)

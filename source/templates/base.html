@@ -40,39 +40,26 @@
         <div class="metadata_box_header">Infobox:</div>
         
         {% if wikipedia_name %}
-            <div class="metadata_line">
-                {% wiki wikipedia_name 'Wikipedia article' %} on 
-                {{ wikipedia_name }}.
+            <div class="metadata_box_line">
+                Wikipedia article on {% wiki wikipedia_name %}.
             </div>
         {% endif %}
         
-        {% if generic_names %}
-            <div class="metadata_line">
-                <b>Generic names:</b>
-                {% for val in generic_names %}
-                    {% if not forloop.last %}
-                        {{ val }},
-                    {% else %}
-                        {{ val }}.
-                    {% endif %}
-                {% endfor %}
-            </div>
-        {% endif %}
+        {% include "metadata_line.html" with key="Generic names" value_list=generic_names %}
         
-        {% if brand_names %}
-            <div class="metadata_line">
-                <b>Brand names:</b>
-                {% for val in brand_names %}
-                    {% if not forloop.last %}
-                        {{ val }},
-                    {% else %}
-                        {{ val }}.
-                    {% endif %}
-                {% endfor %}
-            </div>
-        {% endif %}
+        {% include "metadata_line.html" with key="Brand names" value_list=brand_names %}
+        
+        {% include "metadata_line.html" with key="Drug class" value_list=drug_class %}
+        
+        {% include "metadata_line.html" with key="Mechanisms" value_list=mechanisms %}
+        
+        {% include "metadata_line.html" with key="Neurotransmitters" value_list=neurotransmitters %}
         
     </div> <!-- div.metadata_box -->
+    
+    {% clearfix %}
+    
+    <h1 class="page_title_repeat">{{ page_title|safe }}:</h1>
 {% endif %}
 
 

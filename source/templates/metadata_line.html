@@ -1,0 +1,12 @@
+{% if value_list %}
+    <div class="metadata_box_line">
+        <b>{{ key }}:</b>
+        {% for val in value_list %}
+            {% if not forloop.last %}
+                {{ val }},
+            {% else %}
+                {{ val }}.
+            {% endif %}
+        {% endfor %}
+    </div> <!-- div.metadata_box_line -->
+{% endif %}

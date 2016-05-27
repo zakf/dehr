@@ -41,7 +41,8 @@ special_tokens = r"""
     (?:,\ )|            # Matches ', ' for ValueListNodes
     (?:\:\ )|           # Matches ': ' for DictPairNodes
     (?:\{%\ indent\ %\})|
-    (?:\{%\ endindent\ %\})
+    (?:\{%\ endindent\ %\})|
+    (?:\{%\ clearfix\ %\})
     
     # NOTE: It does NOT end in a | (OR).
 """
@@ -286,8 +287,9 @@ def unescape_double_newline(input_token_list):
     return clean_token_list
 
 
-NON_P_TOKENS = ['{% indent %}', '{% endindent %}']
-ALL_NON_P_TOKENS = ['<', '<nop>', '{% indent %}', '{% endindent %}']
+NON_P_TOKENS = ['{% indent %}', '{% endindent %}', '{% clearfix %}']
+ALL_NON_P_TOKENS = ['<', '<nop>', '{% indent %}', '{% endindent %}', 
+                    '{% clearfix %}']
 
 class OneLineNode(Node):
     """A nonterminal node

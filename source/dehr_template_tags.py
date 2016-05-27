@@ -35,6 +35,11 @@ def endindent():
     return mark_safe('</div> <!-- div.indent -->')
 
 
+@register.simple_tag
+def clearfix():
+    return mark_safe('<div class="clearfix">.</div>')
+
+
 WIKI_URL = ("http://en.wikipedia.org/w/index.php?"
             "search=%s&title=Special%%3ASearch")
 
