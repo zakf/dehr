@@ -57,6 +57,8 @@ These are To-Do items:
 
 9. {% indent %} makes <div class="indent"> and {% endindent %} similarly.
 
+9.5. Maybe necessary, maybe not: {% try_link %} tag, which TRIES to make a link to 'target', but iff UrlLookupError then it just makes it plain flat text. This will be used in (10) below.
+
 10. Metadata in the infobox should get a {% link %} tag iff possible. So if we have this:
     Neurotransmitters: DA, NE, 5-HT.
 Then each of those three abbreviations should be a {% link %} internal hyperlink to the correct page.
