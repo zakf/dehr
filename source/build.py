@@ -414,8 +414,7 @@ def compile_one_page(base_dir, engine, apd, page_filename):
     
     neurotransmitters = get_list_or_empty('Neurotransmitters')
     
-    if (wikipedia_name or brand_names or generic_names or neurotransmitters or 
-        related_names):
+    if (brand_names or generic_names or neurotransmitters or related_names):
         has_metadata = True
     else:
         has_metadata = False

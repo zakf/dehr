@@ -31,6 +31,12 @@
         <br />
         <a href="index.html">Home</a>
     {% endifnotequal %}
+    
+    {% if not has_metadata %}
+        {% if wikipedia_name %}
+            Wikipedia article on {% wiki wikipedia_name %}
+        {% endif %}
+    {% endif %}
 </div> <!-- div.subheader -->
 
 
