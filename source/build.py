@@ -267,7 +267,19 @@ class AllPageData(object):
         self.prior = AllPageDataPart(False)
         self.next = AllPageDataPart(False)
     
-    def make_prior(self, base_dir):
+    def save_next(self, base_dir):
+        """Create the file all_page_data.py using self.next"""
+        next_str = self.next_to_str('all_page')
+        apd_filepath = os.path.join(base_dir, 'source', 'all_page_data.py')
+        apd_file = open(apd_filepath, 'wb')
+        apd_file.write("# File: all_page_data.py\n# \n")
+        apd_file.write("# This file was written by AllPageData.save_next().")
+        apd_file.write("\n\n")
+        apd_file.write(next_str)
+        apd_file.close()
+        print "Saved the AllPageData.next object to all_page_data.py."
+    
+    def populate_prior(self, base_dir):
         """Populate self using the all_page_data.py file"""
         # TODO actually populate self.prior using a Python file.
         self.prior.read_only = True
@@ -450,4 +462,4 @@ if __name__ == '__main__':
             if page_filename[-5:] == '.html':
                 compile_one_page(BASE_DIR, engine, apd, page_filename)
         
-        print apd.next_to_str('apd')
+        apd.save_next(BASE_DIR)
