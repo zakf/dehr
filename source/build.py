@@ -403,10 +403,14 @@ def compile_one_page(base_dir, engine, apd, page_filename):
     generic_names = get_list_or_empty('Generic names')
     for generic_name in generic_names:
         apd.add_alias(generic_name, page_filename)
+    related_names = get_list_or_empty('Related names')
+    for related_name in related_names:
+        apd.add_alias(related_name, page_filename)
     
     neurotransmitters = get_list_or_empty('Neurotransmitters')
     
-    if (wikipedia_name or brand_names or generic_names or neurotransmitters):
+    if (wikipedia_name or brand_names or generic_names or neurotransmitters or 
+        related_names):
         has_metadata = True
     else:
         has_metadata = False
@@ -434,6 +438,7 @@ def compile_one_page(base_dir, engine, apd, page_filename):
         'has_metadata': has_metadata,
         'brand_names': brand_names,
         'generic_names': generic_names,
+        'related_names': related_names,
         'neurotransmitters': neurotransmitters,
         'mechanisms': get_list_or_empty('Mechanisms'),
         'drug_class': get_list_or_empty('Drug class'),

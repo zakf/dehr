@@ -3,7 +3,7 @@
 # This file was written by AllPageData.save_next().
 
 all_page_titles = OrderedDict([
-    ('Cocaine', 'deprecated_cocaine.html'),
+    ('Cocaine', 'cocaine.html'),
     ('Escitalopram (Lexapro)', 'lexapro.html'),
     ('Dextroamphetamine (Dexedrine)', 'dexedrine.html'),
     ('Welcome to the Drug Education and Harm Reduction Website', 'index.html'),
@@ -11,8 +11,10 @@ all_page_titles = OrderedDict([
 ])
 
 all_page_aliases = OrderedDict([
-    ('cocaine', 'deprecated_cocaine.html'),
-    ('deprecated_cocaine', 'deprecated_cocaine.html'),
+    ('cocaine', 'cocaine.html'),
+    ('crack', 'cocaine.html'),
+    ('crack cocaine', 'cocaine.html'),
+    ('coke', 'cocaine.html'),
     ('escitalopram (lexapro)', 'lexapro.html'),
     ('deprecated_lexapro', 'deprecated_lexapro.html'),
     ('dextroamphetamine (dexedrine)', 'dexedrine.html'),
