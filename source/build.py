@@ -373,6 +373,10 @@ def compile_one_page(base_dir, engine, apd, page_filename):
         apd.add_alias(page_filename[:-5], page_filename)
     # TODO add all meta_dict.generic_names and brand_names
     
+    page_type = meta_dict.get('Page type', [None])[0]
+    if not page_type:
+        page_type = 'Not specified'
+    
     ## Old method, cannot deal with Django template syntax in the page_file:
     # base_template = engine.get_template('base.html')
     
@@ -391,6 +395,7 @@ def compile_one_page(base_dir, engine, apd, page_filename):
     context_object = Context({
         'page_title': wpn.title,
         # 'page_content': wpn.content,  # Now I do this manually, see above.
+        'page_type': page_type,
     })
     rendered = template_object.render(context_object)
     
