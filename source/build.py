@@ -342,6 +342,9 @@ def compile_one_page(base_dir, engine, apd, page_filename):
     
     """
     
+    if page_filename[:8] == 'example_':
+        return None
+    
     page_filepathname = os.path.join(base_dir, 'source', 'pages', page_filename)
     page_file = open(page_filepathname, 'rb')
     page_raw = page_file.read()
@@ -445,6 +448,8 @@ def compile_one_page(base_dir, engine, apd, page_filename):
         'neurotransmitters': neurotransmitters,
         'mechanisms': get_list_or_empty('Mechanisms'),
         'drug_class': get_list_or_empty('Drug class'),
+        'medical_uses': get_list_or_empty('Medical uses'),
+        'esoteric_medical_uses': get_list_or_empty('Esoteric medical uses'),
     })
     
     if page_type == 'Index':

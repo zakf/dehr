@@ -8,6 +8,7 @@ all_page_titles = OrderedDict([
     ('Dextroamphetamine (Dexedrine)', 'dexedrine.html'),
     ('Heroin', 'heroin.html'),
     ('Welcome to the Drug Education and Harm Reduction Website', 'index.html'),
+    ('Methamphetamine', 'methamphetamine.html'),
     ('Test Page 01 (This Is the Title)', 'test_page_01.html'),
 ])
 
@@ -39,6 +40,17 @@ all_page_aliases = OrderedDict([
     ('cipralex', 'lexapro.html'),
     ('escitalopram', 'lexapro.html'),
     ('s-citalopram', 'lexapro.html'),
+    ('methamphetamine', 'methamphetamine.html'),
+    ('desoxyn', 'methamphetamine.html'),
+    ('desoxyephedrine', 'methamphetamine.html'),
+    ('n-methylamphetamine', 'methamphetamine.html'),
+    ('meth', 'methamphetamine.html'),
+    ('methedrine', 'methamphetamine.html'),
+    ('vicks vapor inhaler', 'methamphetamine.html'),
+    ('crystal', 'methamphetamine.html'),
+    ('d-methamphetamine', 'methamphetamine.html'),
+    ('l-methamphetamine', 'methamphetamine.html'),
+    ('levmetamfetamine', 'methamphetamine.html'),
     ('test page 01 (this is the title)', 'test_page_01.html'),
     ('test_page_01', 'test_page_01.html'),
 ])

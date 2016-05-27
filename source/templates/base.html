@@ -57,6 +57,10 @@
         
         {% include "metadata_line.html" with key="Neurotransmitters" value_list=neurotransmitters %}
         
+        {% include "metadata_line.html" with key="Medical uses" value_list=medical_uses %}
+        
+        {% include "metadata_line.html" with key="Esoteric medical uses" value_list=esoteric_medical_uses %}
+        
         {% if related_names %}
             <div class="metadata_box_line">
                 <b>* Note 1:</b> The related names above <i>may not</i> refer specifically to the topic of this page, they are only related. They may be slang terms which are ill-defined. They may be more specific or more broad than the page title.
