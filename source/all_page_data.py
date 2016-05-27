@@ -3,18 +3,19 @@
 # This file was written by AllPageData.save_next().
 
 all_page_titles = OrderedDict([
-    ('Cocaine', 'cocaine.html'),
+    ('Cocaine', 'deprecated_cocaine.html'),
+    ('Escitalopram (Lexapro)', 'deprecated_lexapro.html'),
     ('Welcome to the Drug Education and Harm Reduction Website', 'index.html'),
-    ('Escitalopram (Lexapro)', 'lexapro.html'),
-    ('This Is the Page Title', 'page_test_01.html'),
+    ('This Is the Page Title', 'test_page_01.html'),
 ])
 
 all_page_aliases = OrderedDict([
-    ('cocaine', 'cocaine.html'),
+    ('cocaine', 'deprecated_cocaine.html'),
+    ('deprecated_cocaine', 'deprecated_cocaine.html'),
+    ('escitalopram (lexapro)', 'deprecated_lexapro.html'),
+    ('deprecated_lexapro', 'deprecated_lexapro.html'),
     ('welcome to the drug education and harm reduction website', 'index.html'),
     ('index', 'index.html'),
-    ('escitalopram (lexapro)', 'lexapro.html'),
-    ('lexapro', 'lexapro.html'),
-    ('this is the page title', 'page_test_01.html'),
-    ('page_test_01', 'page_test_01.html'),
+    ('this is the page title', 'test_page_01.html'),
+    ('test_page_01', 'test_page_01.html'),
 ])

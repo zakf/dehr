@@ -88,3 +88,8 @@ h1.page_title {
     text-align: center;
     margin-top: 5px;
 }
+
+div.subheader {
+    text-align: center;
+    margin: 10px;
+}
