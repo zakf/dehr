@@ -41,6 +41,29 @@ class AllPageDataTest(unittest.TestCase):
         self.assertEqual(apd.find_url('escitaLOPram'), 'lexapro.html')
         with self.assertRaisesRegexp(UrlLookupError, 'all_page_data.py'):
             apd.find_url('not_in_the_dict')
+    
+    def test_next_to_str(self):
+        apd = AllPageData()
+        apd.add_title('Olanzapine (Zyprexa)', 'zyprexa.html')
+        apd.add_title('Ziprasidone (Geodon)', 'geodon.html')
+        apd.add_alias('Olanzapine', 'zyprexa.html')
+        apd.add_alias('Zyprexa', 'zyprexa.html')
+        apd.add_alias('Ziprasidone', 'geodon.html')
+        apd.add_alias('Geodon', 'geodon.html')
+        self.assertEqual(
+            apd.next_to_str('bunny_ocean'),
+            """bunny_ocean_titles = OrderedDict([
+    ('Olanzapine (Zyprexa)', 'zyprexa.html'),
+    ('Ziprasidone (Geodon)', 'geodon.html'),
+])
+
+bunny_ocean_aliases = OrderedDict([
+    ('olanzapine', 'zyprexa.html'),
+    ('zyprexa', 'zyprexa.html'),
+    ('ziprasidone', 'geodon.html'),
+    ('geodon', 'geodon.html'),
+])
+""")
 
 
 #============================== If Name Is Main ===============================#

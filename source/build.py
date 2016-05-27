@@ -152,6 +152,24 @@ $                       # Matches the end of the string.
 """)
 
 
+def od_to_str(od, var_name):
+    """Print an OrderedDict in a standardized format, return a string
+    
+    Arguments:
+        od:         OrderedDict to be printed.
+        
+        var_name:   String, the variable name for this OrderedDict.
+    
+    """
+    
+    o = ['%s = OrderedDict([\n' % var_name]
+    for key in od:
+        o.append('    (%r, ' % key)
+        o.append('%r),\n' % od[key])
+    o.append('])\n')
+    return ''.join(o)
+
+
 class AllPageDataPart(object):
     """Holds all the page titles, page URLs, and page aliases
     
@@ -284,6 +302,12 @@ class AllPageData(object):
                 "once more, because it uses an old cached list of aliases. "
                 "Alternatively, look at all_page_data.py." % alt_name)
         return page_filename
+    
+    def next_to_str(self, var_name):
+        o = [od_to_str(self.next.titles, '%s_titles' % var_name)]
+        o.append('\n')
+        o.append(od_to_str(self.next.aliases, '%s_aliases' % var_name))
+        return ''.join(o)
 
 
 def compile_one_page(base_dir, engine, apd, page_filename):
@@ -324,7 +348,12 @@ def compile_one_page(base_dir, engine, apd, page_filename):
     whole_page_node.render()
     wpn = whole_page_node
     
-    # TODO: Access and use whole_page_node.meta_dict
+    meta_dict = whole_page_node.meta_dict   # An OrderedDict of metadata
+    apd.add_title(wpn.title, page_filename)
+    apd.add_alias(wpn.title, page_filename)
+    if page_filename[-5:] == '.html':
+        apd.add_alias(page_filename[:-5], page_filename)
+    # TODO add all meta_dict.generic_names and brand_names
     
     ## Old method, cannot deal with Django template syntax in the page_file:
     # base_template = engine.get_template('base.html')
@@ -420,3 +449,5 @@ if __name__ == '__main__':
         for page_filename in sorted(os.listdir(pages_dir)):
             if page_filename[-5:] == '.html':
                 compile_one_page(BASE_DIR, engine, apd, page_filename)
+        
+        print apd.next_to_str('apd')
