@@ -1,5 +1,9 @@
 DEHR Readme.txt:
 
+The latest GitHub committed version is available here, but it may take several minutes to update and I don't always push changes to GitHub:
+
+https://rawgit.com/zakf/dehr/master/build/index.html
+
 
 #================================ Simple Tasks ================================#
 
